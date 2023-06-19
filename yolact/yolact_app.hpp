@@ -63,7 +63,8 @@
 enum SourceType
 {
     images,
-    video
+    video,
+    camera
 };
 class FeatureData
 {

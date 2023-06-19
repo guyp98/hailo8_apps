@@ -65,7 +65,8 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
     
     YolactParams *init_params = init("dont_care","dont_care");
     std::sort(features.begin(), features.end(), &FeatureData::sort_tensors_by_size);
-    for (size_t i = 0; (Source==SourceType::video) || i < frames_count; i++)
+
+    for (size_t i = 0; (Source==SourceType::video) || (Source == SourceType::camera) || i < frames_count; i++)
     {
         // Gather the features into HailoTensors in a HailoROIPtr
         HailoROIPtr roi = std::make_shared<HailoROI>(HailoROI(HailoBBox(0.0f, 0.0f, 1.0f, 1.0f)));
@@ -85,14 +86,16 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         }
         // get the frame from source
         HailoRGBMat image = HailoRGBMat( cv::Mat(1,1, 0) , "dummy");
-        if(Source==SourceType::video)
+        if(Source==SourceType::video || Source == SourceType::camera)
         {
+            
             std::lock_guard<std::mutex> lock(queueMutex);
             if (frameQueue.empty())
             {
                 std::cout<<"frameQueue.empty()"<<std::endl;
                 continue;
             }
+            
             cv::Mat frame = frameQueue.front();
             frameQueue.pop();
             if (frame.empty())
@@ -226,10 +229,16 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::vector<HailoRGBMa
             return status;
         }
     }
-    else if(Source==SourceType::video)
+    else if(Source==SourceType::video || Source==SourceType::camera)
     {
-        cv::VideoCapture cap(VideoPath); 
-    
+        
+        cv::VideoCapture cap;
+        if (Source == SourceType::camera) {
+            cap = cv::VideoCapture(0);
+        } else {
+            cap = cv::VideoCapture(VideoPath);
+        }  
+        
         // Check if camera opened successfully
         if(!cap.isOpened()){
             std::cout << "Error opening video stream or file" << std::endl;
@@ -239,10 +248,10 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::vector<HailoRGBMa
         {
             cv::Mat org_frame;
             cap >> org_frame;
-
+            
             if (org_frame.empty())
                 break;
-
+            
             cv::Mat resized_image;
             image_resize(resized_image,org_frame, YOLACT_IMAGE_WIDTH, YOLACT_IMAGE_HEIGHT);
             
@@ -264,7 +273,7 @@ hailo_status read_all(hailo_output_vstream output_vstream, const size_t frames_c
 {
 
     size_t i = 0;
-    while((Source==SourceType::video) || i < frames_count  )
+    while((Source==SourceType::video) || Source == SourceType::camera || i < frames_count  )
     {
         auto &buffer = feature->m_buffers.get_write_buffer();
         hailo_status status = hailo_vstream_read_raw_buffer(output_vstream, buffer.data(), buffer.size());
@@ -285,7 +294,6 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
 {
     // Create features data to be used for post-processing
     std::vector<std::shared_ptr<FeatureData>> features;
-
     features.reserve(output_vstreams_size);
     for (size_t i = 0; i < output_vstreams_size; i++)
     {
@@ -308,16 +316,16 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     {
         output_threads.emplace_back(std::async(read_all, output_vstreams[i], frames_count, features[i]));
     }
-    
+      
     //queue to send the original frame from "write_all" to "post_prossing_all" for display
     std::queue<cv::Mat> frameQueue;
     std::mutex queueMutex;
-
+   
     // Create write thread
     auto input_thread(std::async(write_all, input_vstream, std::ref(input_images), std::ref(frameQueue), std::ref(queueMutex)));
     
     // Create post-process thread
-    
+   
     auto pp_thread(std::async(post_processing_all, std::ref(features), frames_count, std::ref(input_images), std::ref(frameQueue), std::ref(queueMutex)));
     
 
@@ -466,10 +474,11 @@ std::vector<std::string> parse_args(int argc, char* argv[])
     options.add_options()("h,help", "Print help")(
       "f,hef", "Path to .hef file", cxxopts::value<std::string>()
       ->default_value(HEF_FILE))(
-      "s,source", "Path to a video or directory with images ", cxxopts::value<std::string>()
+      "s,source", "Path to a video file or directory with images ", cxxopts::value<std::string>()
       ->default_value(VideoPath))(
       "d, display", "Display output (true or false)", cxxopts::value<bool>()
-      ->default_value("true"));
+      ->default_value("true"))(
+      "c,camera", "Use camera as the source");
       
     
     auto result = options.parse(argc, argv);
@@ -478,6 +487,14 @@ std::vector<std::string> parse_args(int argc, char* argv[])
     {
         std::cout << options.help() << std::endl;
         exit(0);
+    }
+   
+    
+    if (result.count("camera") > 0 && result.count("source") > 0)
+    {
+        std::cerr << "Both camera and source options cannot be specified together" << std::endl;
+        std::cerr << options.help() << std::endl;
+        exit(1);
     }
     // if (!result.count("file") || !result.count("source") || !result.count("hef")) {
     //     std::cerr << "Missing required arguments" << std::endl;
@@ -491,6 +508,10 @@ std::vector<std::string> parse_args(int argc, char* argv[])
     if(is_folder_of_images(source_path))
     {
         Source = SourceType::images;
+    }
+    else if (result.count("camera"))
+    {
+        Source = SourceType::camera;
     }
     else if (is_video(source_path))
     {
@@ -553,7 +574,7 @@ int main(int argc, char* argv[])
     std::string source_path = args[1];
     std::printf("hef_path: %s\n", hef_path.c_str());
     std::printf("source_path: %s\n", source_path.c_str());
-    std::printf("source type: %s\n", Source==SourceType::images ? "images" : "video");
+    std::printf("source type: %s\n", Source==SourceType::images ? "images" : (Source==SourceType::video ? "video" : "camera"));
     std::printf("display: %s\n", Display ? "true" : "false");
     if(Source==SourceType::images)
     {
@@ -573,9 +594,10 @@ int main(int argc, char* argv[])
             return status;
         }
     }
-    else if(Source==SourceType::video)
+    else if(Source==SourceType::video || Source==SourceType::camera)
     {   
         std::vector<HailoRGBMat> input_images;
+        
         status = infer(input_images);
         if (HAILO_SUCCESS != status)
         {
