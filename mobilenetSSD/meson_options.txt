@@ -1,0 +1,8 @@
+
+
+# External requirements (default values under)
+option('include_blas', type : 'boolean', value : false)
+option('libblas', type : 'string', value : '../dependencies/core/open_source/xtensor_stack/blas')
+option('libxtensor', type : 'string', value : '../dependencies/core/open_source/xtensor_stack/base')
+
+
