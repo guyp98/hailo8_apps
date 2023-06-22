@@ -36,7 +36,7 @@ set(common_tensors_file ${relative_workspace}/core/hailo/libs/postprocesses/comm
 
 # Include directories
 include_directories(
-  SYSTEM core/open_source/rapidjson
+  SYSTEM ${relative_workspace}core/open_source/rapidjson
   ${relative_workspace}/core/hailo/general
   ${relative_workspace}/core/hailo/libs/postprocesses
   ${relative_workspace}/core/hailo/libs/postprocesses/instance_segmentation

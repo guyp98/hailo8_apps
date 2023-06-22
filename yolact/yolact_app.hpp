@@ -36,7 +36,7 @@
 #define OUTPUT_COUNT (16)
 #define INPUT_FILES_COUNT (95)
 
-#define HEF_FILE ("..\\..\\network_hef\\yolact_regnetx_800mf.hef")
+#define HEF_FILE "..\\..\\network_hef\\yolact_regnetx_800mf.hef"
 // #define VideoPath "..\\..\\input_images\\car_drive.mp4"
 #define VideoPath "..\\..\\input_images\\detection.mp4"
 // #define VideoPath "..\\..\\input_images\\river_tiber1280x1024.m4v"
