@@ -2,6 +2,7 @@
 #define MULTISTREAMDISPLAY_HPP
 
 #include <opencv2/opencv.hpp>
+#include <cmath>
 
 class MultiStreamDisplay {
 private:

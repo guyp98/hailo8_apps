@@ -2,7 +2,7 @@
 
 MultiStreamDisplay::MultiStreamDisplay(int numStreams, int cellSize)
     : numStreams_(numStreams), cellSize_(cellSize) {
-    gridRows_ = std::sqrt(numStreams_);
+    gridRows_ = std::ceil(std::sqrt(numStreams));
     gridCols_ = gridRows_;
     // Initialize the grid frame
     gridFrame_ = cv::Mat(gridRows_ * cellSize_, gridCols_ * cellSize_, CV_8UC3, cv::Scalar(0, 0, 0));

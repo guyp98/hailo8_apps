@@ -9,6 +9,7 @@ int main() {
     captures.push_back(cv::VideoCapture("../car_drive.mp4"));  // Second video stream
     captures.push_back(cv::VideoCapture("../car_drive.mp4"));  // Third video stream
     captures.push_back(cv::VideoCapture("../car_drive.mp4"));  // Fourth video stream
+
     int numStreams = captures.size();
 
     std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;
