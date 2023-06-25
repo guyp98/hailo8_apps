@@ -17,7 +17,7 @@ int main() {
         frameQueues.push_back(queue);
     }
 
-    DemuxStreams demuxStreams(numStreams, frameQueues);
+    
 
     std::vector<cv::Mat> frames(numStreams);
 
@@ -27,10 +27,11 @@ int main() {
         }
 
     // Create a thread for running the demuxStreams.readAndDisplayStreams() function
-    // std::thread displayThread([&demuxStreams]() {
-    //     while(true)
-    //         demuxStreams.readAndDisplayStreams();
-    // });
+    std::thread displayThread([numStreams,frameQueues]() {
+        DemuxStreams demuxStreams(numStreams, frameQueues);
+        while(true)
+            demuxStreams.readAndDisplayStreams();
+    });
 
     while (true) {
         bool endReached = false;
@@ -40,15 +41,14 @@ int main() {
                 endReached = true;
                 break;
             }
-            frameQueues[i]->push(frames[i]);
+            frameQueues[i]->push(frames[i].clone());
         }
 
         if (endReached)
             break;
 
-        demuxStreams.readAndDisplayStreams();
-        // Delay between frames (optional)
-        cv::waitKey(10);
+        // demuxStreams.readAndDisplayStreams();
+        
     }
 
     // Release the video capture resources
@@ -57,7 +57,7 @@ int main() {
     }
 
     // Wait for the display thread to finish
-    // displayThread.join();
+    displayThread.join();
 
     return 0;
 }

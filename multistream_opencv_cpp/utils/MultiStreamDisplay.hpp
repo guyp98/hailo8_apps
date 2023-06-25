@@ -10,6 +10,7 @@ private:
     int gridCols_;
     int cellSize_;
     cv::Mat gridFrame_;
+    std::vector<double> lastTimestamps_;
 
 public:
     MultiStreamDisplay(int numStreams, int cellSize = 400);

@@ -11,7 +11,7 @@ private:
     int streamIndex;
     std::queue<cv::Mat> frameQueue;
     std::mutex mtx;
-    // std::condition_variable cv;
+    std::condition_variable con_v;
 
 public:
     SynchronizedQueue(int streamIndex);

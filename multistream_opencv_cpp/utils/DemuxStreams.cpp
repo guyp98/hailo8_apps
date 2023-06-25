@@ -9,7 +9,6 @@ void DemuxStreams::readAndDisplayStreams() {
     std::map<int, cv::Mat> frames;
     for (std::shared_ptr<SynchronizedQueue> queue : frameQueues) {
         cv::Mat frame = queue->pop();
-        std::cout << "Displaying frame from queue " << queue->getStreamIndex() << std::endl;
         int queueIndex = queue->getStreamIndex();
         frames.insert(std::make_pair(queueIndex, frame));
     }
