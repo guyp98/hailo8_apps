@@ -34,5 +34,13 @@
 *.vscode
 build/
 output_images/
+*.mp4
+*.avi
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.gif
+
 ```
 
