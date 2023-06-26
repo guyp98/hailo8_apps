@@ -128,6 +128,7 @@ public:
 
             m_image_width = _tensors[0]->width() * 32;
             m_image_height = _tensors[0]->height() * 32;
+
             _layers.reserve(_tensors.size());
             for (std::size_t i = 0; i < _tensors.size(); i++)
             {
