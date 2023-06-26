@@ -10,6 +10,7 @@ class DemuxStreams {
 private:
     MultiStreamDisplay display;
     std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;
+    std::map<int, cv::Mat> lastFrames;
 
 public:
     DemuxStreams(const int numStreams, const std::vector<std::shared_ptr<SynchronizedQueue>>& syncQueue);

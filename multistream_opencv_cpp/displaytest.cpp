@@ -5,10 +5,10 @@
 
 int main() {
     std::vector<cv::VideoCapture> captures;
-    captures.push_back(cv::VideoCapture("../car_drive.mp4"));  // First video stream
-    captures.push_back(cv::VideoCapture("../car_drive.mp4"));  // Second video stream
-    captures.push_back(cv::VideoCapture("../car_drive.mp4"));  // Third video stream
-    captures.push_back(cv::VideoCapture("../car_drive.mp4"));  // Fourth video stream
+    captures.push_back(cv::VideoCapture("../../input_images/car_drive.mp4"));  // First video stream
+    captures.push_back(cv::VideoCapture("../../input_images/car_drive.mp4"));  // Second video stream
+    captures.push_back(cv::VideoCapture("../../input_images/detection.mp4"));  // Third video stream
+    captures.push_back(cv::VideoCapture(0));  // Fourth video stream
 
     int numStreams = captures.size();
 
@@ -18,7 +18,6 @@ int main() {
         frameQueues.push_back(queue);
     }
 
-    
 
     std::vector<cv::Mat> frames(numStreams);
 
@@ -39,8 +38,12 @@ int main() {
         for (int i = 0; i < numStreams; i++) {
             captures[i] >> frames[i];
             if (frames[i].empty()) {
-                endReached = true;
-                break;
+                
+                numStreams--;
+                if(numStreams == 0){
+                    break;
+                    endReached = true;
+                }
             }
             frameQueues[i]->push(frames[i].clone());
         }

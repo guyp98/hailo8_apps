@@ -6,6 +6,8 @@
 #include <mutex>
 #include <queue>
 
+
+
 class SynchronizedQueue {
 private:
     int streamIndex;
@@ -18,6 +20,7 @@ public:
     void push(cv::Mat frame);
     cv::Mat pop();
     int getStreamIndex() const;
+    bool empty() ;
 };
 
 #endif  // SYNCHRONIZEDQUEUE_HP

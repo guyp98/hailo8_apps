@@ -20,7 +20,7 @@ void MultiStreamDisplay::displayFrames(std::map<int, cv::Mat>& frames) {
     }
     for (int streamIndex = 0; streamIndex < numStreams_; streamIndex++) {
         cv::Mat frame = frames[streamIndex];  // Clone the input frame to avoid modifying the original
-        // Resize the frame to match the desired cell size
+        
         cv::resize(frame, frame, cv::Size(cellSize_, cellSize_));
         
         int row = streamIndex / gridCols_;

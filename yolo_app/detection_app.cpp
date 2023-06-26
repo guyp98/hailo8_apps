@@ -279,9 +279,10 @@ hailo_status read_all(hailo_output_vstream output_vstream, const size_t frames_c
         hailo_status status = hailo_vstream_read_raw_buffer(output_vstream, buffer.data(), buffer.size());
         feature->m_buffers.release_write_buffer();
 
-        if (HAILO_SUCCESS == status)
+        if (HAILO_SUCCESS == status){
             i++;
             continue;
+        }
         std::cerr << "Failed reading with status = " << status << std::endl;
         return status;
         
