@@ -68,8 +68,8 @@ inline const char* ToString(network_type v)
 #include <filesystem>
 namespace fs = std::filesystem;
 #else
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
 
 FaceDetectionParams *init(const std::string config_path, const std::string function_name)
