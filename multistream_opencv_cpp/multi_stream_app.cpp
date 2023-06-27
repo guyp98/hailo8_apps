@@ -42,22 +42,10 @@ hailo_status create_feature(hailo_output_vstream vstream,
 
 
 hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &features,
-                                 std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex, int numStreams)
+                                 std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex,std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues)
 {
     auto status = HAILO_SUCCESS;
     
-
-    std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;
-    for (int i = 0; i < numStreams; i++) {
-        auto queue = std::make_shared<SynchronizedQueue>(i);
-        frameQueues.push_back(queue);
-    }
-    // Create a thread for running the demuxStreams.readAndDisplayStreams() function
-   
-    std::thread([&numStreams, &frameQueues](){
-        DemuxStreams demuxStreams(numStreams, frameQueues);
-        demuxStreams.readAndDisplayStreams();
-        }).detach();
     
     YoloParams *init_params = init(CONFIG_FILE, "yolov5");
     std::sort(features.begin(), features.end(), &FeatureData::sort_tensors_by_size);
@@ -104,12 +92,9 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
 }
 hailo_status display_image(HailoRGBMat &image, HailoROIPtr roi, int stream_id, std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues)
 {
-    
-    std::string name = image.get_name();
-    
+    std::string name = image.get_name();   
     // Draw the results
     auto draw_status = draw_all(image, roi, true);
-    
     if (OVERLAY_STATUS_OK != draw_status)
     {
         std::cerr << "Failed drawing detections on image '" << name << "'. Got status " << draw_status << "\n";
@@ -119,8 +104,6 @@ hailo_status display_image(HailoRGBMat &image, HailoROIPtr roi, int stream_id, s
     cv::cvtColor(image.get_mat(), write_mat, cv::COLOR_RGB2BGR);
     
     frameQueues[stream_id]->push(write_mat.clone());
-    
-
     return HAILO_SUCCESS;
 }
 
@@ -128,7 +111,6 @@ hailo_status display_image(HailoRGBMat &image, HailoROIPtr roi, int stream_id, s
 
 hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex, std::vector<cv::VideoCapture>& captures)
 {
-   
     int numStreams = captures.size();
     while (true) {
         cv::Mat org_frame;
@@ -158,12 +140,8 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
             frameQueue.push(resized_image.clone());
             
         }
-
         if (endReached)
-            break;
-
-     
-        
+            break; 
     }
     // Release the video capture resources
     for (cv::VideoCapture& capture : captures) {
@@ -210,7 +188,7 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
         features.emplace_back(feature);
     }
 
-    // Create read threads
+    // Create read threads, for each output of the network (aka out vstream) we have a thread that reads the output
     std::vector<std::future<hailo_status>> output_threads;
     output_threads.reserve(output_vstreams_size);
     for (size_t i = 0; i < output_vstreams_size; i++)
@@ -218,29 +196,38 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
         output_threads.emplace_back(std::async(read_all, output_vstreams[i], features[i]));
     }
       
-    //queue to send the original frame from "write_all" to "post_prossing_all" for display
     
+    std::vector<cv::VideoCapture> captures;
+    captures.push_back(cv::VideoCapture(0));  
+    captures.push_back(cv::VideoCapture(0));  
+    captures.push_back(cv::VideoCapture(0)); 
+    captures.push_back(cv::VideoCapture(0));  
+    captures.push_back(cv::VideoCapture(0));  
+    captures.push_back(cv::VideoCapture(0));  
+
+    int numStreams = captures.size();
+    std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;
+    for (int i = 0; i < numStreams; i++) {
+        auto queue = std::make_shared<SynchronizedQueue>(i);
+        frameQueues.push_back(queue);
+    }
+
+    // Create a thread for running the demux Streams and display function
+    std::thread([&numStreams, &frameQueues](){
+        DemuxStreams demuxStreams(numStreams, frameQueues);
+        demuxStreams.readAndDisplayStreams();
+        }).detach();
+
+    //queue to send the original frame from "write_all" to "post_prossing_all" for drawing the detections
     std::queue<cv::Mat> frameQueue;
     std::queue<int> streamIdQueue;
     std::mutex queueMutex;
-    
-   
-    // Create write thread
-    std::vector<cv::VideoCapture> captures;
-    captures.push_back(cv::VideoCapture("../../input_images/car_drive.mp4"));  // First video stream
-    captures.push_back(cv::VideoCapture("../../input_images/detection.mp4"));  // Third video stream
-    captures.push_back(cv::VideoCapture(0));  // Fourth video stream
-    captures.push_back(cv::VideoCapture(0));  // Fourth video stream
-    captures.push_back(cv::VideoCapture("../../input_images/car_drive.mp4"));  // First video stream
-    captures.push_back(cv::VideoCapture("../../input_images/detection.mp4"));  // Third video stream
-    captures.push_back(cv::VideoCapture(0));  // Fourth video stream
-    captures.push_back(cv::VideoCapture(0));  // Fourth video stream
 
+    // Create write thread that will write the input to the device
     auto input_thread(std::async(write_all, input_vstream, std::ref(frameQueue), std::ref(streamIdQueue), std::ref(queueMutex), std::ref(captures)));
     
-    // Create post-process thread
-    
-    auto pp_thread(std::async(post_processing_all, std::ref(features), std::ref(frameQueue), std::ref(streamIdQueue), std::ref(queueMutex), captures.size()));
+    // Create post-process thread that will get features from the read threads and do post-processing
+    auto pp_thread(std::async(post_processing_all, std::ref(features), std::ref(frameQueue), std::ref(streamIdQueue), std::ref(queueMutex), frameQueues));
     
 
     ;

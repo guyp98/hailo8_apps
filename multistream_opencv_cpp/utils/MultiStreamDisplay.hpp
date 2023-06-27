@@ -14,7 +14,7 @@ private:
     std::vector<double> lastTimestamps_;
 
 public:
-    MultiStreamDisplay(int numStreams, int cellSize = 640);
+    MultiStreamDisplay(int numStreams, int cellSize = 400);
     void displayFrames(cv::Mat frame, int streamIndex);
 };
 

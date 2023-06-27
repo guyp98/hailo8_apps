@@ -79,7 +79,7 @@ hailo_status display_image(HailoRGBMat &image, HailoROIPtr roi, int stream_id, s
 hailo_status create_feature(hailo_output_vstream vstream,
                             std::shared_ptr<FeatureData> &feature);
 hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &features, 
-                                 std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex, int numStreams);
+                                 std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex, std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues);
 
 hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex, std::vector<cv::VideoCapture>& captures);
 hailo_status read_all(hailo_output_vstream output_vstream,  std::shared_ptr<FeatureData> feature);
