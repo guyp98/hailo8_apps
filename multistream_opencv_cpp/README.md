@@ -1,15 +1,8 @@
 # Desctiption
-run multipule video or camera streams on one hailo chip.
+Run multipule video or camera streams on one hailo chip. 
+The app takes multipule streams and muxes them to the hailo chip. 
+The output stream from the chip then demuxed and sent for display. 
 
-{source} ----->|                           ----->| {display}
-
-{source} ----->|                           ----->| {display}
-
-{source} ----->|----->  {hailo cip} ----->|----->| {display}
-
-{source} ----->|                           ----->| {display}
-
-{source} ----->|                           ----->| {display}
 
 
 ## Build Environment
@@ -27,8 +20,8 @@ run multipule video or camera streams on one hailo chip.
     cmake --build . --config Release
     .\Release\multi_stream_app.exe
     ```
-* {network to run} - YOLOV5_APP or POSE_EST_APP or SEMANTIC_APP or INSTANCE_SEG_APP or MOBILENETSSD_APP
-
+* {network to run} - YOLOV5_APP or POSE_EST_APP or SEMANTIC_APP or INSTANCE_SEG_APP or MOBILENETSSD_APP 
+for example "cmake -DMACRO_SET=YOLOV5_APP .."
 ## Common Pitfalls
 
 * If the project path is too long, you may encounter an error. It is recommended to keep your path short.
