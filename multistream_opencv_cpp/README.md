@@ -1,10 +1,14 @@
 # Desctiption
 run multipule video or camera streams on one hailo chip.
 
-{source} ----->|                           ----->| {display} 
 {source} ----->|                           ----->| {display}
+
+{source} ----->|                           ----->| {display}
+
 {source} ----->|----->  {hailo cip} ----->|----->| {display}
+
 {source} ----->|                           ----->| {display}
+
 {source} ----->|                           ----->| {display}
 
 
