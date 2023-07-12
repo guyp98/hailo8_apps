@@ -11,6 +11,7 @@
 
  
 bool Display = true;
+int numofStreams = 4;
 
 
 hailo_status create_feature(hailo_output_vstream vstream,
@@ -211,10 +212,12 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     
     std::vector<cv::VideoCapture> captures;
     for (int i = 0; i < numofStreams; i++) {
-        if(i%2 == 0)
+        if(i%3 == 0)
             captures.push_back(cv::VideoCapture( VideoPath0));  
+        else if(i%3 == 1)
+            captures.push_back(cv::VideoCapture( VideoPath1));
         else
-            captures.push_back(cv::VideoCapture( VideoPath1));  
+            captures.push_back(cv::VideoCapture( VideoPath2));  
     }
       
 
@@ -348,7 +351,30 @@ l_exit:
 }
 
 
+void parse_args(int argc, char* argv[])
+{
+    cxxopts::Options options("MyProgram", "A brief description");
+    
+    options.add_options()("h,help", "Print help")(
+      "s,num_fo_streams", "number of streams to run ", cxxopts::value<int>()
+      ->default_value("4"))(
+      "d, display", "Display output (true or false)", cxxopts::value<bool>()
+      ->default_value("true"));
+      
+    
+    auto result = options.parse(argc, argv);
+    
+    if (result.count("help")) 
+    {
+        std::cout << options.help() << std::endl;
+        exit(0);
+    }
+   
+    Display = result["display"].as<bool>();
+    numofStreams = result["num_fo_streams"].as<int>(); 
 
+
+}
 hailo_status image_resize(cv::Mat &resized_image,cv::Mat from_image, int image_width, int image_height)
 {    
     cv::resize(from_image, resized_image, cv::Size(IMAGE_WIDTH, IMAGE_HEIGHT), 0, 0, cv::INTER_AREA);
@@ -367,9 +393,11 @@ hailo_status image_resize(cv::Mat &resized_image,cv::Mat from_image, int image_w
 
 int main(int argc, char* argv[])
 {   
-    hailo_status status;
+    parse_args(argc, argv);
     std::printf("display: %s\n", Display ? "true" : "false");
-    
+    std::printf("number of streams: %d\n", numofStreams);
+
+    hailo_status status;
     status = infer();
     if (HAILO_SUCCESS != status)
     {
