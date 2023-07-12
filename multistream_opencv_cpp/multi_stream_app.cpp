@@ -39,20 +39,31 @@ hailo_status create_feature(hailo_output_vstream vstream,
     return HAILO_SUCCESS;
 }
 
-
+void post_process_fun(HailoROIPtr roi)
+{
+    #ifdef YOLOV5_APP
+        YoloParams *init_params = init(CONFIG_FILE, "yolov5");
+        yolov5(roi, init_params);
+    #elif defined(POSE_EST_APP)
+        centerpose_416(roi);
+    #elif defined(SEMANTIC_APP)
+        filter(roi);
+    #elif defined(INSTANCE_SEG_APP)
+        YolactParams *init_params = init("dont_care","dont_care");
+        yolact800mf(roi,init_params);
+    #elif defined(MOBILENETSSD_APP)
+        mobilenet_ssd(roi);
+    #endif 
+}
 
 hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &features,
                                  std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex,std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues)
 {
     auto status = HAILO_SUCCESS;
-    
-    
-    YoloParams *init_params = init(CONFIG_FILE, "yolov5");
     std::sort(features.begin(), features.end(), &FeatureData::sort_tensors_by_size);
 
     while (true)
     {
-        
         // Gather the features into HailoTensors in a HailoROIPtr
         HailoROIPtr roi = std::make_shared<HailoROI>(HailoROI(HailoBBox(0.0f, 0.0f, 1.0f, 1.0f)));
         for (uint j = 0; j < features.size(); j++)
@@ -62,8 +73,9 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         // auto start = std::chrono::high_resolution_clock::now();
         
         // Perform the actual postprocess
-         yolov5(roi, init_params);
-        
+        // yolov5(roi, init_params);
+        post_process_fun(roi);
+
         // auto end = std::chrono::high_resolution_clock::now();
         // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         // std::cout << "Postprosses On Host Runtime: " << duration.count() << " milliseconds" << std::endl;
@@ -198,12 +210,13 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
       
     
     std::vector<cv::VideoCapture> captures;
-    captures.push_back(cv::VideoCapture(0));  
-    captures.push_back(cv::VideoCapture(0));  
-    captures.push_back(cv::VideoCapture(0)); 
-    captures.push_back(cv::VideoCapture(0));  
-    captures.push_back(cv::VideoCapture(0));  
-    captures.push_back(cv::VideoCapture(0));  
+    for (int i = 0; i < numofStreams; i++) {
+        if(i%2 == 0)
+            captures.push_back(cv::VideoCapture( VideoPath0));  
+        else
+            captures.push_back(cv::VideoCapture( VideoPath1));  
+    }
+      
 
     int numStreams = captures.size();
     std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;
@@ -350,92 +363,11 @@ hailo_status image_resize(cv::Mat &resized_image,cv::Mat from_image, int image_w
     cv::cvtColor(resized_image, resized_image, cv::COLOR_BGR2RGB);
     return HAILO_SUCCESS;
 }
-std::vector<std::string> parse_args(int argc, char* argv[])
-{
-    cxxopts::Options options("MyProgram", "A brief description");
-    
-    options.add_options()("h,help", "Print help")(
-      "f,hef", "Path to .hef file", cxxopts::value<std::string>()
-      ->default_value(HEF_FILE))(
-      "s,source", "Path to a video file or directory with images ", cxxopts::value<std::string>()
-      ->default_value(VideoPath))(
-      "d, display", "Display output (true or false)", cxxopts::value<bool>()
-      ->default_value("true"))(
-      "c,camera", "Use camera as the source");
-      
-    
-    auto result = options.parse(argc, argv);
-    
-    if (result.count("help")) 
-    {
-        std::cout << options.help() << std::endl;
-        exit(0);
-    }
-   
-    
-    if (result.count("camera") > 0 && result.count("source") > 0)
-    {
-        std::cerr << "Both camera and source options cannot be specified together" << std::endl;
-        std::cerr << options.help() << std::endl;
-        exit(1);
-    }
-    
-    
-    Display = result["display"].as<bool>();
-    std::string hef_path = result["hef"].as<std::string>(); 
-    std::string source_path = result["source"].as<std::string>();
-    
-    std::vector<std::string> args;
-    args.push_back(hef_path);
-    args.push_back(source_path);
-    return args;
-}
-bool is_video(const std::string& path) {
-    std::filesystem::path p(path);
-    if (!std::filesystem::exists(p)) {
-        return false;
-    }
-    if (!std::filesystem::is_regular_file(p)) {
-        return false;
-    }
-    if (!p.has_extension()) {
-        return false;
-    }
-    if (p.extension() != ".mp4" && p.extension() != ".avi") {
-        return false;
-    }
-    return true;
-}
-bool is_folder_of_images(const std::string& path) {
-    std::filesystem::path p(path);
-    if (!std::filesystem::exists(p)) {
-        return false;
-    }
-    if (!std::filesystem::is_directory(p)) {
-        return false;
-    }
-    for (const auto& entry : std::filesystem::directory_iterator(p)) {
-        if (!std::filesystem::is_regular_file(entry)) {
-            return false;
-        }
-        if (!entry.path().has_extension()) {
-            return false;
-        }
-        if (entry.path().extension() != ".png" && entry.path().extension() != ".jpg" && entry.path().extension() != ".png" ) {
-            return false;
-        }
-    }
-    return true;
-}
+
 
 int main(int argc, char* argv[])
 {   
     hailo_status status;
-    std::vector<std::string> args = parse_args(argc, argv);
-    std::string hef_path = args[0];
-    std::string source_path = args[1];
-    std::printf("hef_path: %s\n", hef_path.c_str());
-    std::printf("source_path: %s\n", source_path.c_str());
     std::printf("display: %s\n", Display ? "true" : "false");
     
     status = infer();

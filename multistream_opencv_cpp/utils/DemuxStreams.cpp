@@ -12,20 +12,20 @@ void DemuxStreams::readAndDisplayStreams() {
             int queueIndex = queue->getStreamIndex();
             cv::Mat frame;
             if(queue->empty()){
-                std::cout << "Queue " << queueIndex << " is empty" << std::endl;
+                // std::cout << "Queue " << queueIndex << " is empty" << std::endl;
                 continue;
             }
             frame = queue->pop();
-             auto start = std::chrono::high_resolution_clock::now();
+            // auto start = std::chrono::high_resolution_clock::now();
         
         
         
             display.displayFrames(frame, queueIndex);
                 
             
-            auto end = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-            std::cout << "display On Host Runtime: " << duration.count() << " milliseconds" << std::endl;
+            // auto end = std::chrono::high_resolution_clock::now();
+            // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            // std::cout << "display On Host Runtime: " << duration.count() << " milliseconds" << std::endl;
         }
     }
     

@@ -9,7 +9,18 @@
 
 #include "hailo/hailort.h"
 #include "utils/double_buffer.hpp"
+#ifdef YOLOV5_APP
 #include "yolo_postprocess.hpp"
+#elif defined(POSE_EST_APP)
+#include "centerpose.hpp"
+#elif defined(SEMANTIC_APP)
+#include "semantic_segmentation.hpp"
+#elif defined(INSTANCE_SEG_APP)
+#include "yolact.hpp"
+#elif defined(MOBILENETSSD_APP)
+#include "mobilenet_ssd.hpp"
+#endif
+
 #include "hailo_objects.hpp"
 #include "hailo_tensors.hpp"
 #include "hailomat.hpp"
@@ -32,17 +43,9 @@
 #include <thread>
 
 
-
-#define INPUT_COUNT (1)
-#define OUTPUT_COUNT (3)
-#define INPUT_FILES_COUNT (10)
-#define HEF_FILE "../../network_hef/yolov5m_wo_spp_60p.hef"
-#define VideoPath "../../input_images/detection.mp4"
-
-#define CONFIG_FILE "../yolov5.json"
-#define IMAGE_WIDTH 640
-#define IMAGE_HEIGHT 640
-#define MAX_BOXES 50
+#define VideoPath0 "..\\..\\input_images\\detection.mp4"
+#define VideoPath1 "..\\..\\input_images\\car_drive.mp4"
+#define numofStreams 4
 
 
 #define SaveFrames false
@@ -86,6 +89,7 @@ hailo_status read_all(hailo_output_vstream output_vstream,  std::shared_ptr<Feat
 hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_output_vstream *output_vstreams,
                                    const size_t output_vstreams_size);
 hailo_status infer();
+void post_process_fun(HailoROIPtr roi, void *params_void_ptr);
 
 
 std::vector<std::string> get_files_in_dir(const std::string& dir_path);

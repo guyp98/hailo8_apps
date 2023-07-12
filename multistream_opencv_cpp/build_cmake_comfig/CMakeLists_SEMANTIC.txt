@@ -1,0 +1,10 @@
+set(MACRO_SET
+    -DSEMANTIC_APP
+    -DINPUT_COUNT=1
+    -DOUTPUT_COUNT=1
+    -DINPUT_FILES_COUNT=95
+    -DHEF_FILE="../../network_hef/fcn8_resnet_v1_18.hef"
+    -DIMAGE_WIDTH=1920
+    -DIMAGE_HEIGHT=1024
+    -DMAX_BOXES=50
+)
