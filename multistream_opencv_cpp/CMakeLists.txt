@@ -19,44 +19,15 @@ else()
   add_definitions(/DNOMINMAX
 				  /D_HAILO_EXPORTING
     )
+  # Set the output directory for the executable
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Release)
 endif()
-
-
-include(ExternalProject)
-set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
-
-# Build xtl
-ExternalProject_Add(xtl
-    GIT_REPOSITORY https://github.com/xtensor-stack/xtl
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtl
-    DCMAKE_PREFIX_PATH=/home/guyp/work_space/windows_app_on_ubuntu/hailo_windows_apps/dependencies/core/open_source/xtl
-    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release
-)
-
-# Build xtensor
-ExternalProject_Add(xtensor
-    GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor #-Dxtl_DIR=${CMAKE_BINARY_DIR}/build/external/xtl/share/cmake/xtl
-    DCMAKE_PREFIX_PATH=/home/guyp/work_space/windows_app_on_ubuntu/hailo_windows_apps/dependencies/core/open_source/xtensor
-    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release
-)
-
-
-
-# Set the include and link directories for external projects
-include_directories(
-    ${EXTERNAL_INSTALL_LOCATION}/xtl/include
-    ${EXTERNAL_INSTALL_LOCATION}/xtensor/include
-)
-link_directories(
-    ${EXTERNAL_INSTALL_LOCATION}/xtl/lib
-    ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
-)
-
 
 
 find_package(OpenCV REQUIRED)
 find_package(HailoRT REQUIRED)
+find_package(xtl REQUIRED)
+find_package(xtensor REQUIRED)
 
 
 set(utils_path ${CMAKE_CURRENT_SOURCE_DIR}/utils/)
@@ -153,4 +124,4 @@ add_executable(multi_stream_app
             ${hailo_utils})
 
 target_compile_definitions(multi_stream_app PUBLIC ${MACRO_SET})
-target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS})
+target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS} xtl xtensor)
