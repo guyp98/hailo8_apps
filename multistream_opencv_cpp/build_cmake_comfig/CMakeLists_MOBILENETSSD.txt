@@ -4,7 +4,7 @@ set(MACRO_SET
     -DOUTPUT_COUNT=6
     -DINPUT_FILES_COUNT=95
     -DHEF_FILE="../../network_hef/ssd_mobilenet_v1.hef"
-    -DCONFIG_FILE="../yolov5.json"
+    -DCONFIG_FILE="../utils/yolov5.json"
     -DIMAGE_WIDTH=300
     -DIMAGE_HEIGHT=300
     -DMAX_BOXES=50

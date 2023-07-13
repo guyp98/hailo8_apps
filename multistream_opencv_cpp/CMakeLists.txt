@@ -8,53 +8,57 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox /fp:fast /Qfast_transcendentals")
   set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
   add_definitions(/DNOMINMAX
-				        /D_HAILO_EXPORTING
-                /W0
-                /DWIN32_LEAN_AND_MEAN
-                 )
-else()
+			      /D_HAILO_EXPORTING
+                  /W0
+                  /DWIN32_LEAN_AND_MEAN
+    )
+elseif(UNIX)
   # Set optimization flags for non-Visual Studio compilers
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
   add_definitions(/DNOMINMAX
-				/D_HAILO_EXPORTING
-        )
+				  /D_HAILO_EXPORTING
+    )
+else()
+    message(FATAL_ERROR "Unsupported compiler")
 endif()
 
-
-include(ExternalProject)
-set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
-
-# Build xtl
-ExternalProject_Add(xtl
-    GIT_REPOSITORY https://github.com/xtensor-stack/xtl
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtl
-    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
-)
-
-# Build xtensor
-ExternalProject_Add(xtensor
-    GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor -Dxtl_DIR=${CMAKE_BINARY_DIR}/build/external/xtl/share/cmake/xtl
-    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
-)
-
-# Set the include and link directories for external projects
-include_directories(
-    ${EXTERNAL_INSTALL_LOCATION}/xtl/include
-    ${EXTERNAL_INSTALL_LOCATION}/xtensor/include
-)
-link_directories(
-    ${EXTERNAL_INSTALL_LOCATION}/xtl/lib
-    ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
-)
-
-
-
+# include directories
 find_package(OpenCV REQUIRED)
 find_package(HailoRT REQUIRED)
+if(UNIX)
+    find_package(xtl REQUIRED)
+    find_package(xtensor REQUIRED)
+elseif(MSVC)
+    include(ExternalProject)
+    set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
 
+    # Build xtl
+    ExternalProject_Add(xtl
+        GIT_REPOSITORY https://github.com/xtensor-stack/xtl
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtl
+        BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    )
 
+    # Build xtensor
+    ExternalProject_Add(xtensor
+        GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor -Dxtl_DIR=${CMAKE_BINARY_DIR}/build/external/xtl/share/cmake/xtl
+        BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+    )
+
+    # Set the include and link directories for external projects
+    include_directories(
+        ${EXTERNAL_INSTALL_LOCATION}/xtl/include
+        ${EXTERNAL_INSTALL_LOCATION}/xtensor/include
+    )
+    link_directories(
+        ${EXTERNAL_INSTALL_LOCATION}/xtl/lib
+        ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
+    )
+endif()
+
+# set the source files
 set(utils_path ${CMAKE_CURRENT_SOURCE_DIR}/utils/)
 set(utility_source_files
     ${utils_path}MultiStreamDisplay.cpp
@@ -142,11 +146,15 @@ else()
 Endif()   
 
 
-
+# build the app
 add_executable(multi_stream_app 
             multi_stream_app.cpp
             ${utility_source_files}
             ${hailo_utils})
 
 target_compile_definitions(multi_stream_app PUBLIC ${MACRO_SET})
-target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS})
+if(UNIX)
+    target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS} xtl xtensor)
+elseif(MSVC)
+    target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS})
+endif()
