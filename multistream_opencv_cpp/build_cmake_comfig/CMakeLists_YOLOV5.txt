@@ -4,7 +4,7 @@ set(MACRO_SET
     -DOUTPUT_COUNT=3
     -DINPUT_FILES_COUNT=10
     -DHEF_FILE="../../network_hef/yolov5m_wo_spp_60p.hef"
-    -DCONFIG_FILE="../yolov5.json"
+    -DCONFIG_FILE="../utils/yolov5.json"
     -DIMAGE_WIDTH=640
     -DIMAGE_HEIGHT=640
     -DMAX_BOXES=50
