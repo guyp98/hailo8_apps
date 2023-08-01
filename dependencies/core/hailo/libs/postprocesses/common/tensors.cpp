@@ -1,11 +1,24 @@
+
 #include "tensors.hpp"
-using namespace common;
+// using namespace common;
 
     //-------------------------------
     // COMMON TRANSFORMS
     //-------------------------------
-    template <typename T>
-    xt::xarray<float> common::dequantize(const xt::xarray<T> &input, const float &qp_scale, const float &qp_zp)
+    
+    xt::xarray<float> common::dequantize(const xt::xarray<uint8_t> &input, const float &qp_scale, const float &qp_zp)
+    {
+        // Rescale the input using the given scale and zero-point
+        auto rescaled_data = (input - qp_zp) * qp_scale;
+        return rescaled_data;
+    }
+    xt::xarray<float> common::dequantize(const xt::xarray<uint16_t> &input, const float &qp_scale, const float &qp_zp)
+    {
+        // Rescale the input using the given scale and zero-point
+        auto rescaled_data = (input - qp_zp) * qp_scale;
+        return rescaled_data;
+    }
+    xt::xarray<float> common::dequantize(const xt::xarray<float> &input, const float &qp_scale, const float &qp_zp)
     {
         // Rescale the input using the given scale and zero-point
         auto rescaled_data = (input - qp_zp) * qp_scale;

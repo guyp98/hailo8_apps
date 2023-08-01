@@ -13,9 +13,12 @@ namespace common
     //-------------------------------
     // COMMON TRANSFORMS
     //-------------------------------
-    template <typename T>
-    xt::xarray<float> dequantize(const xt::xarray<T> &input, const float &qp_scale, const float &qp_zp);
-
+    // template <typename T>
+    // xt::xarray<float> dequantize(const xt::xarray<T> &input, const float &qp_scale, const float &qp_zp);
+    
+    xt::xarray<float> dequantize(const xt::xarray<uint8_t> &input, const float &qp_scale, const float &qp_zp);
+    xt::xarray<float> dequantize(const xt::xarray<uint16_t> &input, const float &qp_scale, const float &qp_zp);
+    xt::xarray<float> dequantize(const xt::xarray<float> &input, const float &qp_scale, const float &qp_zp);
 
     xt::xarray<uint8_t> get_xtensor(HailoTensorPtr &tensor);
 

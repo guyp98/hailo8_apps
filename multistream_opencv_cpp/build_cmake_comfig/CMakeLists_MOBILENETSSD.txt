@@ -4,6 +4,9 @@ set(MACRO_SET
     -DOUTPUT_COUNT=6
     -DINPUT_FILES_COUNT=95
     -DHEF_FILE="../../network_hef/ssd_mobilenet_v1.hef"
+    -DVideoPath0="../../input_images/detection.mp4"
+    -DVideoPath1="../../input_images/car_drive.mp4"
+    -DVideoPath2="../../input_images/car_drive.mp4"
     -DCONFIG_FILE="../utils/yolov5.json"
     -DIMAGE_WIDTH=300
     -DIMAGE_HEIGHT=300

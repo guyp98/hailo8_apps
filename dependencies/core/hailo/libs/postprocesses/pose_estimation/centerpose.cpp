@@ -365,16 +365,21 @@ std::vector<HailoDetection> centerpose_postprocess(HailoROIPtr roi,
 
     // These are just the offsets within the 160x160 grid, we still need to add the indices
     // Current shape of topk_keypoints_rescaled is { 20, 34 }, so we need to reshape to --> { 20, 17, 2 }
+    std::cout << "test " << std::endl;
     topk_keypoints_rescaled = xt::reshape_view(topk_keypoints_rescaled, {k, num_joints, 2});      // Reshape from {20, 34}
     auto topk_keypoints_x = xt::view(topk_keypoints_rescaled, xt::all(), xt::all(), xt::keep(0)); // Extract the x offsets
     auto topk_keypoints_y = xt::view(topk_keypoints_rescaled, xt::all(), xt::all(), xt::keep(1)); // Extract the y offsets
     // Add the x and y indices, reshape and tile so they are in shape --> {20, 17, 1}
+    std::cout << "test2 " << std::endl;
     topk_keypoints_x += xt::tile(xt::reshape_view(topk_scores_x_index, {k, 1, 1}), {1, num_joints, 1});
+    std::cout << "test2.3 " << std::endl;
     topk_keypoints_y += xt::tile(xt::reshape_view(topk_scores_y_index, {k, 1, 1}), {1, num_joints, 1});
+    std::cout << "test2.2 " << std::endl;
     xt::xarray<float> keypoints = xt::stack(xt::xtuple(topk_keypoints_x, topk_keypoints_y), 2); // Stack x and y together
+    std::cout << "test3 " << std::endl;
     // Stacking adds a new dim, so reshape to { 20, 17, 2 }
     keypoints = xt::reshape_view(keypoints, {k, num_joints, 2});
-
+    std::cout << "test4 " << std::endl;
     // We need to prepare the center_offset_keypoints into this shape as well
     // Reshape the mask from {num_joints, k} --> {num_joints, k, 1} so that we can stack it later
     topk_joint_score_rescaled = xt::reshape_view(topk_joint_score_rescaled, {num_joints, k, 1});

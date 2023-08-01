@@ -73,9 +73,10 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         
         // auto start = std::chrono::high_resolution_clock::now();
         
-        // Perform the actual postprocess
-        // yolov5(roi, init_params);
+        // Run the post processing
+        
         post_process_fun(roi);
+        
 
         // auto end = std::chrono::high_resolution_clock::now();
         // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -219,7 +220,8 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
         else
             captures.push_back(cv::VideoCapture( VideoPath2));  
     }
-      
+    
+    
 
     int numStreams = captures.size();
     std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;

@@ -26,37 +26,35 @@ endif()
 # include directories
 find_package(OpenCV REQUIRED)
 find_package(HailoRT REQUIRED)
-if(UNIX)
-    find_package(xtl REQUIRED)
-    find_package(xtensor REQUIRED)
-elseif(MSVC)
-    include(ExternalProject)
-    set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
 
-    # Build xtl
-    ExternalProject_Add(xtl
-        GIT_REPOSITORY https://github.com/xtensor-stack/xtl
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtl
-        BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
-    )
+include(ExternalProject)
+set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
 
-    # Build xtensor
-    ExternalProject_Add(xtensor
-        GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor -Dxtl_DIR=${CMAKE_BINARY_DIR}/build/external/xtl/share/cmake/xtl
-        BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
-    )
+ExternalProject_Add(xtl
+    GIT_REPOSITORY https://github.com/xtensor-stack/xtl
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtl
+    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+)
 
-    # Set the include and link directories for external projects
-    include_directories(
-        ${EXTERNAL_INSTALL_LOCATION}/xtl/include
-        ${EXTERNAL_INSTALL_LOCATION}/xtensor/include
-    )
-    link_directories(
-        ${EXTERNAL_INSTALL_LOCATION}/xtl/lib
-        ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
-    )
-endif()
+# Build xtensor
+ExternalProject_Add(xtensor
+    GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor -Dxtl_DIR=${CMAKE_BINARY_DIR}/build/external/xtl/share/cmake/xtl
+    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
+)
+
+# Set the include and link directories for external projects
+include_directories(
+    ${EXTERNAL_INSTALL_LOCATION}/xtl/include
+    ${EXTERNAL_INSTALL_LOCATION}/xtensor/include
+)
+link_directories(
+    ${EXTERNAL_INSTALL_LOCATION}/xtl/lib
+    ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
+)
+
+find_package(xtensor REQUIRED)
+message(STATUS "Found xtensor: " ${xtensor_INCLUDE_DIRS})
 
 # set the source files
 set(utils_path ${CMAKE_CURRENT_SOURCE_DIR}/utils/)
@@ -66,7 +64,8 @@ set(utility_source_files
     ${utils_path}DemuxStreams.cpp
     )
 
-set(relative_workspace ../dependencies)
+
+set(relative_workspace ../dependencies/)
 set(overlay_file ${relative_workspace}/core/hailo/plugins/overlay/overlay.cpp)
 set(post_detection ${relative_workspace}/core/hailo/libs/postprocesses/detection/yolo_postprocess.cpp)
 set(post_detection2 ${relative_workspace}/core/hailo/libs/postprocesses/detection/yolo_output.cpp)
@@ -75,6 +74,8 @@ set(post_semantic_seg ${relative_workspace}/core/hailo/libs/postprocesses/semant
 set(post_instance_seg ${relative_workspace}/core/hailo/libs/postprocesses/instance_segmentation/yolact.cpp)
 set(post_mobilenet ${relative_workspace}/core/hailo/libs/postprocesses/detection/mobilenet_ssd.cpp)
 set(common_tensors_file ${relative_workspace}/core/hailo/libs/postprocesses/common/tensors.cpp)
+
+
 
 include_directories(
     utils_path
@@ -150,11 +151,9 @@ Endif()
 add_executable(multi_stream_app 
             multi_stream_app.cpp
             ${utility_source_files}
-            ${hailo_utils})
+            ${hailo_utils}
+            )
 
 target_compile_definitions(multi_stream_app PUBLIC ${MACRO_SET})
-if(UNIX)
-    target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS} xtl xtensor)
-elseif(MSVC)
-    target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS})
-endif()
+
+target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS} )

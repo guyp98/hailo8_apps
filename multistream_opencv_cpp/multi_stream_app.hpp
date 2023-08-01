@@ -43,9 +43,9 @@
 #include <thread>
 
 
-#define VideoPath0 "..\\..\\input_images\\detection.mp4"
-#define VideoPath1 "..\\..\\input_images\\car_drive.mp4"
-#define VideoPath2 0
+// #define VideoPath0 "../../input_images/detection.mp4"
+// #define VideoPath1 "../../input_images/car_drive.mp4"
+// #define VideoPath2 "../../input_images/car_drive.mp4"
 
 
 
