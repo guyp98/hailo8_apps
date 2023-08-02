@@ -146,6 +146,7 @@ else()
     message(FATAL_ERROR "No macro set")
 Endif()   
 
+include(${apps_base_conf}DownloadFile.cmake)
 
 # build the app
 add_executable(multi_stream_app 
