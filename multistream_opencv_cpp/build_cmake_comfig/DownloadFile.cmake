@@ -42,6 +42,8 @@ endforeach()
 
 
 
+
+
 #Download video files
 set(video_names
     "car_drive.mp4"
@@ -54,12 +56,11 @@ set(videos_urls
     "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/multistream+app+(guy)/river_tiber1280x1024.m4v"
     )
 
-    # Define the directory to download the files to
+# Define the directory to download the files to
 set(download_dir "../../input_images")
 
 # Create the directory if it doesn't exist
 file(MAKE_DIRECTORY ${download_dir})
-
 
 list(LENGTH video_names list_length)
 math(EXPR list_length "${list_length} - 1")
@@ -70,7 +71,6 @@ foreach(i RANGE 0 ${list_length})
     
     list(GET video_names ${i} filename)
     list(GET videos_urls ${i} url)
-    
 
     # Check if the file already exists in the download directory
     if(NOT EXISTS "${download_dir}/${filename}")
