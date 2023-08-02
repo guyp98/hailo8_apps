@@ -76,7 +76,7 @@ set(post_mobilenet ${relative_workspace}/core/hailo/libs/postprocesses/detection
 set(common_tensors_file ${relative_workspace}/core/hailo/libs/postprocesses/common/tensors.cpp)
 
 
-
+# set the include directories
 include_directories(
     utils_path
     SYSTEM ${relative_workspace}/core/open_source/rapidjson
@@ -88,6 +88,7 @@ include_directories(
     ${relative_workspace}/core/open_source/cxxopts
     )
 
+    
 # select the app to build
 set(apps_base_conf ./build_cmake_comfig/)
 option(MACRO_SET "Select the app to build" "YOLOV5_APP or POSE_EST_APP or SEMANTIC_APP or INSTANCE_SEG_APP")
@@ -146,6 +147,7 @@ else()
     message(FATAL_ERROR "No macro set")
 Endif()   
 
+# download the model
 include(${apps_base_conf}DownloadFile.cmake)
 
 # build the app
