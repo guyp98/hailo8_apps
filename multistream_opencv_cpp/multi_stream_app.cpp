@@ -301,13 +301,13 @@ hailo_status infer()
     hailo_input_vstream input_vstreams[INPUT_COUNT] = {NULL};
     hailo_output_vstream output_vstreams[OUTPUT_COUNT] = {NULL};
 
-    status = hailo_create_pcie_device(NULL, &device);
+    status = hailo_create_vdevice(NULL, &device);
     REQUIRE_SUCCESS(status, l_exit, "Failed to create pcie_device");
 
     status = hailo_create_hef_file(&hef, HEF_FILE);
     REQUIRE_SUCCESS(status, l_release_device, "Failed reading hef file");
 
-    status = hailo_init_configure_params(hef, HAILO_STREAM_INTERFACE_PCIE, &config_params);
+    status = hailo_init_configure_params(hef, HAILO_STREAM_INTERFACE_INTEGRATED , &config_params);
     REQUIRE_SUCCESS(status, l_release_hef, "Failed initializing configure parameters");
 
     status = hailo_configure_device(device, hef, &config_params, &network_group, &network_group_size);

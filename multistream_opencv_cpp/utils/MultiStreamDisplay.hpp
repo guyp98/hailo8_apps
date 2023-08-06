@@ -12,10 +12,12 @@ private:
     int cellSize_;
     cv::Mat gridFrame_;
     std::vector<double> lastTimestamps_;
+    cv::VideoWriter videoWriter_;
 
 public:
     MultiStreamDisplay(int numStreams, int cellSize = 400);
     void displayFrames(cv::Mat frame, int streamIndex);
+    ~MultiStreamDisplay();
 };
 
 #endif  // MULTISTREAMDISPLAY_HPP

@@ -2,30 +2,35 @@ cmake_minimum_required(VERSION 3.20.0)
 project(MultiCameraDisplay)
 
 set(CMAKE_CXX_STANDARD 20)
-if(MSVC)
-  message("Set optimization flags for Visual Studio")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Ox /fp:fast /Qfast_transcendentals")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox /fp:fast /Qfast_transcendentals")
-  set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
-  add_definitions(/DNOMINMAX
-			      /D_HAILO_EXPORTING
-                  /W0
-                  /DWIN32_LEAN_AND_MEAN
-    )
-elseif(UNIX)
-  # Set optimization flags for non-Visual Studio compilers
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
-  add_definitions(/DNOMINMAX
-				  /D_HAILO_EXPORTING
-    )
-else()
-    message(FATAL_ERROR "Unsupported compiler")
-endif()
+# if(MSVC)
+#   message("Set optimization flags for Visual Studio")
+#   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Ox /fp:fast /Qfast_transcendentals")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox /fp:fast /Qfast_transcendentals")
+#   set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+#   add_definitions(/DNOMINMAX
+# 			      /D_HAILO_EXPORTING
+#                   /W0
+#                   /DWIN32_LEAN_AND_MEAN
+#     )
+# elseif(UNIX)
+#   # Set optimization flags for non-Visual Studio compilers
+#   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
+#   add_definitions(/DNOMINMAX
+# 				  /D_HAILO_EXPORTING
+#     )
+# else()
+#     message(FATAL_ERROR "Unsupported compiler")
+# endif()
+set(COMPILE_OPTIONS -pipe -g -feliminate-unused-debug-types -O3)
 
 # include directories
-find_package(OpenCV REQUIRED)
-find_package(HailoRT REQUIRED)
+# find_package(OpenCV REQUIRED)
+set(USR_OPENCV_INCLUDE_DIRS /opt/poky/4.0.2/sysroots/armv8a-poky-linux/usr/include/opencv4)
+set(OPENCV_VIDEOIO_LIBS /opt/poky/4.0.2/sysroots/armv8a-poky-linux/usr/lib/libopencv_videoio.so.4.5.5 /opt/poky/4.0.2/sysroots/armv8a-poky-linux/usr/lib/libopencv_imgproc.so.4.5.5 /opt/poky/4.0.2/sysroots/armv8a-poky-linux/usr/lib/libopencv_core.so.405 /opt/poky/4.0.2/sysroots/armv8a-poky-linux/usr/lib/libopencv_imgcodecs.so.405) 
+# find_package(HailoRT REQUIRED)
+set(HAILO_INCLUDE_DIRS /opt/poky/4.0.2/sysroots/armv8a-poky-linux/usr/include/hailort)
+set(LIB_HAILORT /opt/poky/4.0.2/sysroots/armv8a-poky-linux/usr/lib/libhailort.so)
 
 include(ExternalProject)
 set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
@@ -39,7 +44,7 @@ ExternalProject_Add(xtl
 # Build xtensor
 ExternalProject_Add(xtensor
     GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor -Dxtl_DIR=${CMAKE_BINARY_DIR}/build/external/xtl/share/cmake/xtl
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor -Dxtl_DIR=${EXTERNAL_INSTALL_LOCATION}/share/cmake/xtl/
     BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
 )
 
@@ -53,8 +58,8 @@ link_directories(
     ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
 )
 
-find_package(xtensor REQUIRED)
-message(STATUS "Found xtensor: " ${xtensor_INCLUDE_DIRS})
+# find_package(xtensor REQUIRED)
+# message(STATUS "Found xtensor: " ${xtensor_INCLUDE_DIRS})
 
 # set the source files
 set(utils_path ${CMAKE_CURRENT_SOURCE_DIR}/utils/)
@@ -86,6 +91,8 @@ include_directories(
     ${relative_workspace}/core/hailo/plugins
     ${relative_workspace}/core/hailo/plugins/overlay
     ${relative_workspace}/core/open_source/cxxopts
+    ${USR_OPENCV_INCLUDE_DIRS}
+    ${HAILO_INCLUDE_DIRS}
     )
 
     
@@ -157,6 +164,7 @@ add_executable(multi_stream_app
             ${hailo_utils}
             )
 
+add_dependencies(multi_stream_app xtl xtensor)
 target_compile_definitions(multi_stream_app PUBLIC ${MACRO_SET})
 
-target_link_libraries(multi_stream_app PUBLIC HailoRT::libhailort ${OpenCV_LIBS} )
+target_link_libraries(multi_stream_app PUBLIC ${LIB_HAILORT} ${OpenCV_LIBS} ${OPENCV_VIDEOIO_LIBS})
