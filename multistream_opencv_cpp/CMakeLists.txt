@@ -37,25 +37,23 @@ set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
 
 ExternalProject_Add(xtl
     GIT_REPOSITORY https://github.com/xtensor-stack/xtl
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtl
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}
     BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
 )
 
 # Build xtensor
 ExternalProject_Add(xtensor
     GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}/xtensor -Dxtl_DIR=${EXTERNAL_INSTALL_LOCATION}/share/cmake/xtl/
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION} -Dxtl_DIR=${EXTERNAL_INSTALL_LOCATION}/share/cmake/xtl/
     BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
 )
 
 # Set the include and link directories for external projects
 include_directories(
-    ${EXTERNAL_INSTALL_LOCATION}/xtl/include
-    ${EXTERNAL_INSTALL_LOCATION}/xtensor/include
+    ${EXTERNAL_INSTALL_LOCATION}/include
 )
 link_directories(
-    ${EXTERNAL_INSTALL_LOCATION}/xtl/lib
-    ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
+    ${EXTERNAL_INSTALL_LOCATION}/lib
 )
 
 # find_package(xtensor REQUIRED)
