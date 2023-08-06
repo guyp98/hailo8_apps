@@ -3,7 +3,7 @@ set(MACRO_SET
     -DINPUT_COUNT=1
     -DOUTPUT_COUNT=6
     -DINPUT_FILES_COUNT=95
-    -DHEF_FILE="../../network_hef/centerpose_repvgg_a0.hef"
+    -DHEF_FILE="../../network_hef/centerpose_repvgg_a0_h15.hef"
     -DVideoPath0="../../input_images/detection.mp4"
     -DVideoPath1="../../input_images/detection.mp4"
     -DVideoPath2="../../input_images/detection.mp4"
