@@ -7,7 +7,7 @@
  * @brief This example demonstrates running inference with virtual streams using the Hailort's C API on yolov5m
  **/
 
-#include "hailo/hailort.h"
+// #include "hailo/hailort.h"
 #include "utils/double_buffer.hpp"
 #ifdef YOLOV5_APP
 #include "yolo_postprocess.hpp"
@@ -32,7 +32,7 @@
 #include <future>
 #include <stdio.h>
 #include <stdlib.h>
-#include <opencv2/opencv.hpp>
+// #include <opencv2/opencv.hpp>
 #include <fstream>
 #include <iostream>
 #include <functional>
