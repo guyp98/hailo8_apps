@@ -18,6 +18,7 @@ MultiStreamDisplay::MultiStreamDisplay(int numStreams, int cellSize)
 }
 
 void MultiStreamDisplay::displayFrames(cv::Mat frame, int streamIndex) {    
+    
     cv::resize(frame, frame, cv::Size(cellSize_, cellSize_));
     
     int row = streamIndex / gridCols_;
@@ -31,11 +32,13 @@ void MultiStreamDisplay::displayFrames(cv::Mat frame, int streamIndex) {
     cv::putText(gridFrame_, watermarkText, cv::Point(col * cellSize_ + 10, row * cellSize_ + 30),
                 cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(255, 255, 255), 2);
 
-    // cv::imshow("Multiple Streams", gridFrame_);
-    // cv::waitKey(1);
-
+    // // cv::imshow("Multiple Streams", gridFrame_);
+    // // cv::waitKey(1);
+    std::cout << "Writing frame " << streamIndex << std::endl;
     // Write the frame to the video file
+    
     videoWriter_.write(gridFrame_);
+    
 }
 
 MultiStreamDisplay::~MultiStreamDisplay() {

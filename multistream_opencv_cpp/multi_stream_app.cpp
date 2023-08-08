@@ -74,8 +74,9 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         // auto start = std::chrono::high_resolution_clock::now();
         
         // Run the post processing
-        
-        post_process_fun(roi);
+        std::cout << "Postprosses" << std::endl;
+        // post_process_fun(roi);
+        // std::cout << "Postprosses end" << std::endl;
         
 
         // auto end = std::chrono::high_resolution_clock::now();
@@ -131,6 +132,7 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
         bool endReached = false;
         for (int i = 0; i < numStreams; i++) {
             captures[i] >> org_frame;
+            std::cout << "read stream " << i << " frame " << org_frame.rows << " " << org_frame.cols << std::endl;
             if (org_frame.empty()) {
                 numStreams--;
                 if(numStreams == 0){
@@ -141,6 +143,8 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
             cv::Mat resized_image;
             image_resize(resized_image,org_frame, IMAGE_WIDTH, IMAGE_HEIGHT);
             
+
+
             // cv::imshow("input", resized_image);
             // cv::waitKey(1);
             hailo_status status = hailo_vstream_write_raw_buffer(input_vstream, resized_image.data, resized_image.total() * resized_image.elemSize());
@@ -213,12 +217,13 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     
     std::vector<cv::VideoCapture> captures;
     for (int i = 0; i < numofStreams; i++) {
-        if(i%3 == 0)
-            captures.push_back(cv::VideoCapture( VideoPath0));  
-        else if(i%3 == 1)
-            captures.push_back(cv::VideoCapture( VideoPath1));
-        else
-            captures.push_back(cv::VideoCapture( VideoPath2));  
+        // if(i%3 == 0)
+            captures.push_back(cv::VideoCapture( 0));  
+            // captures.push_back(cv::VideoCapture("v4l2src device=/dev/video0 io-mode=mmap ! video/x-raw,format=NV12,width=1920,height=1080, framerate=60/1 ! appsink", cv::CAP_GSTREAMER));  
+        // else if(i%3 == 1)
+        //     captures.push_back(cv::VideoCapture( VideoPath1));
+        // else
+        //     captures.push_back(cv::VideoCapture( VideoPath2));  
     }
     
     
@@ -366,55 +371,7 @@ l_exit:
 
 
 
-//     status = hailo_create_vdevice(NULL, &vdevice);
-//     REQUIRE_SUCCESS(status, l_exit, "Failed to create pcie_device");
 
-//     status = hailo_create_hef_file(&hef, HEF_FILE);
-//     REQUIRE_SUCCESS(status, l_release_device, "Failed reading hef file");
-
-//     status = hailo_init_configure_params(hef, HAILO_STREAM_INTERFACE_INTEGRATED , &config_params);
-//     REQUIRE_SUCCESS(status, l_release_hef, "Failed initializing configure parameters");
-
-//     status = hailo_configure_device(vdevice, hef, &config_params, &network_group, &network_group_size);
-//     REQUIRE_SUCCESS(status, l_release_hef, "Failed configure devcie from hef");
-//     REQUIRE_ACTION(network_group_size == 1, status = HAILO_INVALID_ARGUMENT, l_release_hef, "Invalid network group size");
-
-//     status = hailo_make_input_vstream_params(network_group, true, HAILO_FORMAT_TYPE_AUTO,
-//                                              input_vstream_params, &input_vstreams_size);
-//     REQUIRE_SUCCESS(status, l_release_hef, "Failed making input virtual stream params");
-
-//     status = hailo_make_output_vstream_params(network_group, true, HAILO_FORMAT_TYPE_AUTO,
-//                                               output_vstream_params, &output_vstreams_size);
-//     REQUIRE_SUCCESS(status, l_release_hef, "Failed making output virtual stream params");
-
-//     REQUIRE_ACTION(((input_vstreams_size == INPUT_COUNT) || (output_vstreams_size == OUTPUT_COUNT)),
-//                    status = HAILO_INVALID_OPERATION, l_release_hef, "Expected one input vstream and three outputs vstreams");
-
-//     status = hailo_create_input_vstreams(network_group, input_vstream_params, input_vstreams_size, input_vstreams);
-//     REQUIRE_SUCCESS(status, l_release_hef, "Failed creating input virtual streams");
-
-//     status = hailo_create_output_vstreams(network_group, output_vstream_params, output_vstreams_size, output_vstreams);
-//     REQUIRE_SUCCESS(status, l_release_input_vstream, "Failed creating output virtual streams");
-
-//     status = hailo_activate_network_group(network_group, NULL, &activated_network_group);
-//     REQUIRE_SUCCESS(status, l_release_output_vstream, "Failed activating network group");
-
-//     status = run_inference_threads(input_vstreams[0], output_vstreams, output_vstreams_size);
-//     REQUIRE_SUCCESS(status, l_deactivate_network_group, "Inference failure");
-
-//     status = HAILO_SUCCESS;
-// l_deactivate_network_group:
-//     (void)hailo_deactivate_network_group(activated_network_group);
-// l_release_output_vstream:
-//     (void)hailo_release_output_vstreams(output_vstreams, output_vstreams_size);
-// l_release_input_vstream:
-//     (void)hailo_release_input_vstreams(input_vstreams, input_vstreams_size);
-// l_release_hef:
-//     (void)hailo_release_hef(hef);
-// l_release_device:
-//     (void)hailo_release_device(vdevice);
-// l_exit:
-//     return status;
 }
 
 
