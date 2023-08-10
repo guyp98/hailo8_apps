@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <iostream>
 
 #define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 #define CLIP(x) (CLAMP(x, 0, 255))
@@ -228,7 +229,8 @@ public:
         auto itr = m_tensors.find(name);
         if (itr == m_tensors.end())
         {
-            throw std::invalid_argument("No tensor with name " + name);
+            std::cout<<"No tensor with name " << name <<std::endl;
+            // throw std::invalid_argument("No tensor with name " + name);
         }
         return itr->second;
     };

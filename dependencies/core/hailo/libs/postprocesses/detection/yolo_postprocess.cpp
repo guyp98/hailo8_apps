@@ -50,12 +50,10 @@ public:
     {
         std::vector<HailoDetection> objects;
         objects.reserve(_max_boxes);
-        std::cout << "extract boxes" << std::endl;
         for (auto layer : _layers)
         {
             extract_boxes(layer, objects);
         }
-        std::cout << "nms post" << std::endl;
         common::nms(objects, _iou_thr);
         if (objects.size() > _max_boxes)
         {
@@ -88,7 +86,6 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
 {
     uint class_id = 0;
     float x, y, h, w, confidence, class_confidence = 0.0f;
-    std::cout << "extract params " << x << " " << y << " " << h << " " << w << " " << confidence << " " << class_confidence << std::endl;
     float xmin, ymin = 0.0f;
     for (uint row = 0; row < layer->_height; ++row)
     {
@@ -96,28 +93,21 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
         {
             for (uint anchor = 0; anchor < layer->NUM_ANCHORS; ++anchor)
             {
-                std::cout << "test1" << std::endl;
                 confidence = layer->get_confidence(row, col, anchor);
                 if (confidence < _detection_thr)
                     continue;
                 std::tie(class_id, class_confidence) = layer->get_class(row, col, anchor);
-                std::cout << "test2" << std::endl;
                 // Final confidence: box confidence * class probability
                 confidence = confidence * class_confidence;
-                std::cout << "test3" << std::endl;
                 if (confidence > _detection_thr)
                 {
                     std::tie(x, y) = layer->get_center(row, col, anchor);
-                    std::cout << "test3" << std::endl;
                     std::tie(w, h) = layer->get_shape(row, col, anchor, m_image_width, m_image_height);
-                    std::cout << "test4" << std::endl;
                     // Get the top left corner of the object.
                     xmin = (x - (w / 2.0f));
                     ymin = (y - (h / 2.0f));
-                    std::cout << "test4.5" << std::endl;
                     objects.push_back(HailoDetection(HailoBBox(xmin, ymin, w, h), class_id, m_dataset[class_id], confidence));
                 }
-                std::cout << "test5" << std::endl;
             }
         }
     }
@@ -366,9 +356,7 @@ void yolov5(HailoROIPtr roi, void *params_void_ptr)
 {
     YoloParams *params = reinterpret_cast<YoloParams *>(params_void_ptr);
     auto post = Yolov5(roi, params);
-    std::cout << "Yolov5 decode" << std::endl;
     auto detections = post.decode();
-    std::cout << "Yolov5 add_detections" << std::endl;
     hailo_common::add_detections(roi, detections);
 }
 

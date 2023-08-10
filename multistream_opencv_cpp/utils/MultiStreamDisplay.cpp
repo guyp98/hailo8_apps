@@ -15,6 +15,7 @@ MultiStreamDisplay::MultiStreamDisplay(int numStreams, int cellSize)
 
     // Initialize the video writer
     videoWriter_.open("output.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 30, cv::Size(gridCols_ * cellSize_, gridRows_ * cellSize_));
+    // videoWriter_.open("appsrc is-live=true block=true format=time ! videoconvert ! x264enc ! rtph265pay ! udpsink host=10.0.0.1 port=5000", 0, 30.0, cv::Size(cellSize_, cellSize_), true);
 }
 
 void MultiStreamDisplay::displayFrames(cv::Mat frame, int streamIndex) {    
@@ -34,7 +35,6 @@ void MultiStreamDisplay::displayFrames(cv::Mat frame, int streamIndex) {
 
     // // cv::imshow("Multiple Streams", gridFrame_);
     // // cv::waitKey(1);
-    std::cout << "Writing frame " << streamIndex << std::endl;
     // Write the frame to the video file
     
     videoWriter_.write(gridFrame_);

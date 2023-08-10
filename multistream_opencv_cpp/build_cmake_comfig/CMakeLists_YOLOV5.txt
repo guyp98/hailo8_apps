@@ -3,10 +3,10 @@ set(MACRO_SET
     -DINPUT_COUNT=1
     -DOUTPUT_COUNT=3
     -DINPUT_FILES_COUNT=10
-    -DHEF_FILE="../../network_hef/yolov5m_wo_spp_60p_h15.hef"
+    -DHEF_FILE="../../network_hef/yolov5m_wo_spp_60p.hef"
     -DVideoPath0="../../input_images/detection.avi"
-    -DVideoPath1="../../input_images/car_drive.mp4"
-    -DVideoPath2="../../input_images/car_drive.mp4"
+    -DVideoPath1="../../input_images/car_drive.avi"
+    -DVideoPath2="../../input_images/car_drive.avi"
     -DCONFIG_FILE="../utils/yolov5.json"
     -DIMAGE_WIDTH=640
     -DIMAGE_HEIGHT=640

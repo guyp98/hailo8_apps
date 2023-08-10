@@ -71,17 +71,17 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
             roi->add_tensor(std::make_shared<HailoTensor>(reinterpret_cast<uint8_t *>(features[j]->m_buffers.get_read_buffer().data()), features[j]->m_vstream_info));
             
         
-        // auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         
         // Run the post processing
-        std::cout << "Postprosses" << std::endl;
-        // post_process_fun(roi);
+        // std::cout << "Postprosses" << std::endl;
+        post_process_fun(roi);
         // std::cout << "Postprosses end" << std::endl;
         
 
-        // auto end = std::chrono::high_resolution_clock::now();
-        // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        // std::cout << "Postprosses On Host Runtime: " << duration.count() << " milliseconds" << std::endl;
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << "Postprosses On Host Runtime: " << duration.count() << " milliseconds" << std::endl;
         
         for (auto &feature : features)
         {
@@ -132,7 +132,6 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
         bool endReached = false;
         for (int i = 0; i < numStreams; i++) {
             captures[i] >> org_frame;
-            std::cout << "read stream " << i << " frame " << org_frame.rows << " " << org_frame.cols << std::endl;
             if (org_frame.empty()) {
                 numStreams--;
                 if(numStreams == 0){
@@ -217,13 +216,13 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     
     std::vector<cv::VideoCapture> captures;
     for (int i = 0; i < numofStreams; i++) {
-        // if(i%3 == 0)
-            captures.push_back(cv::VideoCapture( 0));  
+        if(i%3 == 0)
+            captures.push_back(cv::VideoCapture( VideoPath0));  
             // captures.push_back(cv::VideoCapture("v4l2src device=/dev/video0 io-mode=mmap ! video/x-raw,format=NV12,width=1920,height=1080, framerate=60/1 ! appsink", cv::CAP_GSTREAMER));  
-        // else if(i%3 == 1)
-        //     captures.push_back(cv::VideoCapture( VideoPath1));
-        // else
-        //     captures.push_back(cv::VideoCapture( VideoPath2));  
+        else if(i%3 == 1)
+            captures.push_back(cv::VideoCapture( VideoPath1));
+        else
+            captures.push_back(cv::VideoCapture( VideoPath2));  
     }
     
     

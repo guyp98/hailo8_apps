@@ -314,7 +314,6 @@ std::vector<HailoDetection> centerpose_postprocess(HailoROIPtr roi,
     xt::xarray<uint8_t> topk_scores = top_scores.second;                                 // Separate out the top scores
     xt::xarray<int> topk_scores_y_index = topk_score_indices / center_heatmap->height(); // Find the y index of the cells
     xt::xarray<int> topk_scores_x_index = topk_score_indices % center_heatmap->width();  // Find the x index of the cells
-
     // With the top k indices in hand, we can now extract the corresponding center offsets and widths/heights
     auto topk_center_offset = gather_features_from_tensor(center_offset, topk_score_indices);   // Use the top k indices from earlier
     auto topk_center_wh = gather_features_from_tensor(center_width_height, topk_score_indices); // Use the top k indices from earlier
@@ -437,10 +436,10 @@ void centerpose(HailoROIPtr roi)
  */
 void centerpose_416(HailoROIPtr roi)
 {
-    CENTER_HEATMAP_OUTPUT_LAYER = "center_nms/ew_add1";
+    CENTER_HEATMAP_OUTPUT_LAYER = "center_nms/ew_add2";//TODO: change in compilation to ew_add1 if not in hailo15
     CENTER_WIDTH_HEIGHT_OUTPUT_LAYER = "centerpose_repvgg_a0/conv37";
     CENTER_OFFSET_OUTPUT_LAYER = "centerpose_repvgg_a0/conv39";
-    JOINT_HEATMAP_OUTPUT_LAYER = "joint_nms/ew_add1";
+    JOINT_HEATMAP_OUTPUT_LAYER = "joint_nms/ew_add2";//TODO: change in compilation to ew_add1 if not in hailo15
     JOINT_OFFSET_OUTPUT_LAYER = "centerpose_repvgg_a0/conv41";
     JOINT_CENTER_OFFSET_OUTPUT_LAYER = "centerpose_repvgg_a0/conv38";
     centerpose(roi);

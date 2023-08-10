@@ -4,9 +4,9 @@ set(MACRO_SET
     -DOUTPUT_COUNT=1
     -DINPUT_FILES_COUNT=95
     -DHEF_FILE="../../network_hef/fcn8_resnet_v1_18.hef"
-    -DVideoPath0="../../input_images/car_drive.mp4"
-    -DVideoPath1="../../input_images/car_drive.mp4"
-    -DVideoPath2="../../input_images/car_drive.mp4"
+    -DVideoPath0="../../input_images/car_drive.avi"
+    -DVideoPath1="../../input_images/car_drive.avi"
+    -DVideoPath2="../../input_images/car_drive.avi"
     -DIMAGE_WIDTH=1920
     -DIMAGE_HEIGHT=1024
     -DMAX_BOXES=50

@@ -449,27 +449,48 @@ std::vector<HailoDetection> instance_segmentation_post(std::map<std::string, Hai
     {
         NETWORK_GROUP = "yolact_regnetx_800mf";
         // // Output layer names for yolact_regnetx_800mf_fpn
-        PROTO_LAYER = NETWORK_GROUP + "/conv86";
+        // PROTO_LAYER = NETWORK_GROUP + "/conv86";
+        // // Set 0
+        // BBOX_0 = NETWORK_GROUP + "/conv81";
+        // MASK_0 = NETWORK_GROUP + "/conv83";
+        // CONF_0 = NETWORK_GROUP + "/conv82";
+        // // Set 1
+        // BBOX_1 = NETWORK_GROUP + "/conv73";
+        // MASK_1 = NETWORK_GROUP + "/conv75";
+        // CONF_1 = NETWORK_GROUP + "/conv74";
+        // // Set 2
+        // BBOX_2 = NETWORK_GROUP + "/conv61";
+        // MASK_2 = NETWORK_GROUP + "/conv63";
+        // CONF_2 = NETWORK_GROUP + "/conv62";
+        // // Set 3
+        // BBOX_3 = NETWORK_GROUP + "/conv64";
+        // MASK_3 = NETWORK_GROUP + "/conv66";
+        // CONF_3 = NETWORK_GROUP + "/conv65";
+        // // Set 4
+        // BBOX_4 = NETWORK_GROUP + "/conv67";
+        // MASK_4 = NETWORK_GROUP + "/conv69";
+        // CONF_4 = NETWORK_GROUP + "/conv68";
+        PROTO_LAYER = NETWORK_GROUP + "/conv86";//TODO change in compilation
         // Set 0
         BBOX_0 = NETWORK_GROUP + "/conv81";
         MASK_0 = NETWORK_GROUP + "/conv83";
         CONF_0 = NETWORK_GROUP + "/conv82";
         // Set 1
-        BBOX_1 = NETWORK_GROUP + "/conv73";
-        MASK_1 = NETWORK_GROUP + "/conv75";
-        CONF_1 = NETWORK_GROUP + "/conv74";
+        BBOX_1 = NETWORK_GROUP + "/conv74";
+        MASK_1 = NETWORK_GROUP + "/conv76";
+        CONF_1 = NETWORK_GROUP + "/conv75";
         // Set 2
-        BBOX_2 = NETWORK_GROUP + "/conv61";
-        MASK_2 = NETWORK_GROUP + "/conv63";
-        CONF_2 = NETWORK_GROUP + "/conv62";
+        BBOX_2 = NETWORK_GROUP + "/conv63";
+        MASK_2 = NETWORK_GROUP + "/conv65";
+        CONF_2 = NETWORK_GROUP + "/conv64";
         // Set 3
-        BBOX_3 = NETWORK_GROUP + "/conv64";
-        MASK_3 = NETWORK_GROUP + "/conv66";
-        CONF_3 = NETWORK_GROUP + "/conv65";
+        BBOX_3 = NETWORK_GROUP + "/conv66";
+        MASK_3 = NETWORK_GROUP + "/conv68";
+        CONF_3 = NETWORK_GROUP + "/conv67";
         // Set 4
-        BBOX_4 = NETWORK_GROUP + "/conv67";
-        MASK_4 = NETWORK_GROUP + "/conv69";
-        CONF_4 = NETWORK_GROUP + "/conv68";
+        BBOX_4 = NETWORK_GROUP + "/conv69";
+        MASK_4 = NETWORK_GROUP + "/conv71";
+        CONF_4 = NETWORK_GROUP + "/conv70";
     }
     else
     {
