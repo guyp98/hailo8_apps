@@ -19,7 +19,7 @@ void DemuxStreams::readAndDisplayStreams() {
             // auto start = std::chrono::high_resolution_clock::now();
         
         
-        
+
             display.displayFrames(frame, queueIndex);
                 
             

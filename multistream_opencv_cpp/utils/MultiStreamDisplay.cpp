@@ -36,7 +36,7 @@ void MultiStreamDisplay::displayFrames(cv::Mat frame, int streamIndex) {
     // // cv::imshow("Multiple Streams", gridFrame_);
     // // cv::waitKey(1);
     // Write the frame to the video file
-    
+
     videoWriter_.write(gridFrame_);
     
 }

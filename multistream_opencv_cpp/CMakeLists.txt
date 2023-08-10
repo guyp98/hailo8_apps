@@ -66,6 +66,7 @@ set(utility_source_files
     ${utils_path}MultiStreamDisplay.cpp
     ${utils_path}SynchronizedQueue.cpp
     ${utils_path}DemuxStreams.cpp
+    ${utils_path}RuntimeMeasure.cpp
     )
 
 
@@ -82,7 +83,7 @@ set(common_tensors_file ${relative_workspace}/core/hailo/libs/postprocesses/comm
 
 # set the include directories
 include_directories(
-    utils_path
+    ${utils_path}
     SYSTEM ${relative_workspace}/core/open_source/rapidjson
     ${relative_workspace}/core/hailo/general
     ${relative_workspace}/core/hailo/libs/postprocesses

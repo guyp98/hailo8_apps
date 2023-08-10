@@ -60,6 +60,8 @@ void post_process_fun(HailoROIPtr roi)
 hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &features,
                                  std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex,std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues)
 {
+    RuntimeMeasure* rm = RuntimeMeasure::getInstance();
+    int num_of_frames = 0;
     auto status = HAILO_SUCCESS;
     std::sort(features.begin(), features.end(), &FeatureData::sort_tensors_by_size);
 
@@ -71,17 +73,18 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
             roi->add_tensor(std::make_shared<HailoTensor>(reinterpret_cast<uint8_t *>(features[j]->m_buffers.get_read_buffer().data()), features[j]->m_vstream_info));
             
         
-        auto start = std::chrono::high_resolution_clock::now();
         
+        RuntimeMeasure* rm = RuntimeMeasure::getInstance();
+        rm->startTimer(2);
         // Run the post processing
         // std::cout << "Postprosses" << std::endl;
         post_process_fun(roi);
         // std::cout << "Postprosses end" << std::endl;
-        
-
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        std::cout << "Postprosses On Host Runtime: " << duration.count() << " milliseconds" << std::endl;
+        num_of_frames++;
+        double time = rm->endTimer(1);
+        std::cout << "hailo+postprocess FPS: " << num_of_frames/(time/1000.0) << std::endl;
+        double time1 = rm->endTimer(2);
+        std::cout << "postprocess milliseconds: " << time1 << std::endl;       
         
         for (auto &feature : features)
         {
@@ -126,6 +129,9 @@ hailo_status display_image(HailoRGBMat &image, HailoROIPtr roi, int stream_id, s
 
 hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex, std::vector<cv::VideoCapture>& captures)
 {
+    //start time measurement
+    RuntimeMeasure* rm = RuntimeMeasure::getInstance();
+    rm->startTimer(1);
     int numStreams = captures.size();
     while (true) {
         cv::Mat org_frame;

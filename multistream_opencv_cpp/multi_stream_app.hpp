@@ -27,6 +27,7 @@
 #include "overlay.hpp"
 #include "utils/SynchronizedQueue.hpp"
 #include "utils/DemuxStreams.hpp"
+#include "utils/RuntimeMeasure.hpp"
 
 #include <algorithm>
 #include <future>
