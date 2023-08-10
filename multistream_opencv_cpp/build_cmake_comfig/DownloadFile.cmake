@@ -6,14 +6,21 @@ set(hef_names
     "ssd_mobilenet_v1.hef"
     "yolact_regnetx_800mf.hef"
     "yolov5m_wo_spp_60p.hef"
+    "h15/centerpose_repvgg_a0_h15.hef"
+    "h15/yolact_regnetx_800mf_h15.hef"
+    "h15/yolov5m_wo_spp_60p_h15.hef"
 )
 set(hef_urls
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/multistream+app+(guy)/centerpose_regnetx_1.6gf_fpn.hef"
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/multistream+app+(guy)/centerpose_repvgg_a0.hef"
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/multistream+app+(guy)/fcn8_resnet_v1_18.hef"
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/multistream+app+(guy)/ssd_mobilenet_v1.hef"
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/multistream+app+(guy)/yolact_regnetx_800mf.hef"
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/multistream+app+(guy)/yolov5m_wo_spp_60p.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/centerpose_regnetx_1.6gf_fpn.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/centerpose_repvgg_a0.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/fcn8_resnet_v1_18.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/ssd_mobilenet_v1.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/yolact_regnetx_800mf.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/yolov5m_wo_spp_60p.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h15/centerpose_repvgg_a0_h15.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h15/yolact_regnetx_800mf_h15.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h15/yolov5m_wo_spp_60p_h15.hef"
+    
 )
 
 # Define the directory to download the files to
@@ -21,6 +28,7 @@ set(download_dir "../../network_hef")
 
 # Create the directory if it doesn't exist
 file(MAKE_DIRECTORY ${download_dir})
+file(MAKE_DIRECTORY "${download_dir}/h15")
 
 
 
@@ -51,9 +59,9 @@ set(video_names
     "river_tiber1280x1024.m4v"
     )
 set(videos_urls 
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/multistream+app+(guy)/car_drive.mp4"
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/multistream+app+(guy)/detection.mp4"
-    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/multistream+app+(guy)/river_tiber1280x1024.m4v"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/car_drive.avi"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/detection.avi"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/river_tiber1280x1024.m4v"
     )
 
 # Define the directory to download the files to
