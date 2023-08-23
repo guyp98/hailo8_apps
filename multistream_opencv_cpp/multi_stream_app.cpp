@@ -82,9 +82,9 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         
         num_of_frames++;
         double time = rm->endTimer(TIMER_1);
-        // std::cout << "hailo+postprocess FPS: " << (num_of_frames/time)*1000.0 << std::endl;
+        std::cout << "hailo+postprocess FPS: " << (num_of_frames/time)*1000.0 << std::endl;
         double time1 = rm->endTimer(TIMER_2);
-        // std::cout << "postprocess milliseconds: " << time1 << std::endl;       
+        std::cout << "postprocess milliseconds: " << time1 << std::endl;       
         
         for (auto &feature : features)
         {
