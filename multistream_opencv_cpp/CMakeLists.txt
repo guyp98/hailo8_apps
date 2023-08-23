@@ -62,6 +62,7 @@ set(utility_source_files
     ${utils_path}MultiStreamDisplay.cpp
     ${utils_path}SynchronizedQueue.cpp
     ${utils_path}DemuxStreams.cpp
+    ${utils_path}RuntimeMeasure.cpp
     )
 
 
