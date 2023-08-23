@@ -26,7 +26,7 @@ The output stream from the chip then demuxed and sent for display.
 3. Install the latest `C++ opencv.msi` for Windows.
 4. Make sure that OpenCV and Hailo Runtime are added to the Windows PATH.
 5. Clone the project.
-6. run the following commands:
+6. run the following commands (in "x64 Native Tool Command Prompt for VS" cmd):
     ```
     mkdir build
     cd build
