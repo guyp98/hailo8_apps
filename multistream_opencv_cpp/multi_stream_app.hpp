@@ -33,7 +33,7 @@
 #include <future>
 #include <stdio.h>
 #include <stdlib.h>
-// #include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <fstream>
 #include <iostream>
 #include <functional>
@@ -42,6 +42,7 @@
 #include <chrono>
 #include <cxxopts.hpp>
 #include <thread>
+#include <numeric>
 
 
 // #define VideoPath0 "../../input_images/detection.mp4"

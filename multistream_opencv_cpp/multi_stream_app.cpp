@@ -11,7 +11,7 @@
 
  
 bool Display;
-int numofStreams = 4;
+int numofStreams;
 
 
 hailo_status create_feature(hailo_output_vstream vstream,
@@ -82,9 +82,9 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         
         num_of_frames++;
         double time = rm->endTimer(TIMER_1);
-        std::cout << "hailo+postprocess FPS: " << (num_of_frames/time)*1000.0 << std::endl;
+        // std::cout << "hailo+postprocess FPS: " << (num_of_frames/time)*1000.0 << std::endl;
         double time1 = rm->endTimer(TIMER_2);
-        std::cout << "postprocess milliseconds: " << time1 << std::endl;       
+        // std::cout << "postprocess milliseconds: " << time1 << std::endl;       
         
         for (auto &feature : features)
         {
@@ -132,26 +132,29 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
     //start time measurement
     RuntimeMeasure* rm = RuntimeMeasure::getInstance();
     rm->startTimer(TIMER_1);
-    int numStreams = captures.size();
+    // int numStreams = captures.size();
+    std::vector<int> numStreams(captures.size());
+    std::iota(numStreams.begin(), numStreams.end(), 0);
     while (true) {
         cv::Mat org_frame;
         bool endReached = false;
-        for (int i = 0; i < numStreams; i++) {
+        for (int &i : numStreams) {
             captures[i] >> org_frame;
+            
+            //find if stream ended
             if (org_frame.empty()) {
-                numStreams--;
-                if(numStreams == 0){
-                    break;
+                numStreams.erase(std::remove(numStreams.begin(), numStreams.end(), i), numStreams.end());
+                if(numStreams.size() == 0){
                     endReached = true;
+                    std::printf("finished reading all streams\n");
                 }
+                break;
             }
+
             cv::Mat resized_image;
             image_resize(resized_image,org_frame, IMAGE_WIDTH, IMAGE_HEIGHT);
             
 
-
-            // cv::imshow("input", resized_image);
-            // cv::waitKey(1);
             hailo_status status = hailo_vstream_write_raw_buffer(input_vstream, resized_image.data, resized_image.total() * resized_image.elemSize());
             if (HAILO_SUCCESS != status)
             {
@@ -359,7 +362,7 @@ hailo_status infer()
     status = run_inference_threads(input_vstreams[0], output_vstreams, output_vstreams_size);
     REQUIRE_SUCCESS(status, l_release_output_vstream, "Inference failure");
 
-    printf("Inference ran successfully\n");
+    std::printf("Inference ran successfully\n");
     status = HAILO_SUCCESS;
 
 l_release_output_vstream:
@@ -407,7 +410,6 @@ void parse_args(int argc, char* argv[])
             std::cerr << "Invalid display argument: " << displayStr << ". please use -h" << std::endl;
             exit(1);
         }
-        printf("display test : %d\n", Display);
         numofStreams = result["num_fo_streams"].as<int>(); 
 
 
