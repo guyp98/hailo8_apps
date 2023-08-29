@@ -11,7 +11,7 @@
 
  
 bool Display;
-int numofStreams = 4;
+int numofStreams;
 
 
 hailo_status create_feature(hailo_output_vstream vstream,
@@ -104,7 +104,15 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
             HailoRGBMat image = HailoRGBMat(frame, "out" + std::to_string(stream_id));
             display_image(image, roi, stream_id, frameQueues);
         }
-        
+        else
+        {
+            if (!frameQueue.empty())
+            {
+                frameQueue.pop();
+                frameIdQueue.pop();
+            }
+        }
+
     }
     return status;
 }
