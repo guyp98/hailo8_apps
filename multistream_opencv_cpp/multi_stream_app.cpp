@@ -72,9 +72,6 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         for (uint j = 0; j < features.size(); j++)
             roi->add_tensor(std::make_shared<HailoTensor>(reinterpret_cast<uint8_t *>(features[j]->m_buffers.get_read_buffer().data()), features[j]->m_vstream_info));
             
-        
-        
-        
         rm->startTimer(TIMER_2);
         
 
@@ -141,9 +138,12 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
     RuntimeMeasure* rm = RuntimeMeasure::getInstance();
     rm->startTimer(TIMER_1);
     int numStreams = captures.size();
+    bool endReached = false;
     while (true) {
+        usleep(30000);
+        // std::cout<<"write_all"<<std::endl;
         cv::Mat org_frame;
-        bool endReached = false;
+        endReached = false;
         for (int i = 0; i < numStreams; i++) {
             captures[i] >> org_frame;
             if (org_frame.empty()) {
@@ -153,23 +153,25 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
                     endReached = true;
                 }
             }
+            
             cv::Mat resized_image;
             image_resize(resized_image,org_frame, IMAGE_WIDTH, IMAGE_HEIGHT);
+            // cv::cvtColor(org_frame, resized_image, cv::COLOR_BGR2RGB);
             
 
 
-            // cv::imshow("input", resized_image);
-            // cv::waitKey(1);
+            
             hailo_status status = hailo_vstream_write_raw_buffer(input_vstream, resized_image.data, resized_image.total() * resized_image.elemSize());
             if (HAILO_SUCCESS != status)
             {
                 std::cerr << "Failed writing to device data of image. Got status = " << status << std::endl;
                 return status;
-            } 
-            std::lock_guard<std::mutex> lock(queueMutex);
-            frameIdQueue.push(i);
-            frameQueue.push(resized_image.clone());
-            
+            }
+            if(Display){ 
+                std::lock_guard<std::mutex> lock(queueMutex);
+                frameIdQueue.push(i);
+                frameQueue.push(resized_image.clone());
+            }
         }
         if (endReached)
             break; 
@@ -230,30 +232,30 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     
     std::vector<cv::VideoCapture> captures;
     for (int i = 0; i < numofStreams; i++) {
-        if(i%3 == 0)
-            captures.push_back(cv::VideoCapture( VideoPath0));  
-            // captures.push_back(cv::VideoCapture("v4l2src device=/dev/video0 io-mode=mmap ! video/x-raw,format=NV12,width=1920,height=1080, framerate=60/1 ! appsink", cv::CAP_GSTREAMER));  
-        else if(i%3 == 1)
-            captures.push_back(cv::VideoCapture( VideoPath1));
-        else
-            captures.push_back(cv::VideoCapture( VideoPath2));  
+        // if(i%3 == 0)
+            captures.push_back(cv::VideoCapture(VideoPath0));  
+        // else if(i%3 == 1)
+        //     captures.push_back(cv::VideoCapture( VideoPath1));
+        // else
+        //     captures.push_back(cv::VideoCapture( VideoPath2));  
     }
     
     
 
     int numStreams = captures.size();
     std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;
-    for (int i = 0; i < numStreams; i++) {
-        auto queue = std::make_shared<SynchronizedQueue>(i);
-        frameQueues.push_back(queue);
+    if(Display){
+        for (int i = 0; i < numStreams; i++) {
+            auto queue = std::make_shared<SynchronizedQueue>(i);
+            frameQueues.push_back(queue);
+        }
+    
+        // Create a thread for running the demux Streams and display function
+        std::thread([&numStreams, &frameQueues](){
+            DemuxStreams demuxStreams(numStreams, frameQueues);
+            demuxStreams.readAndDisplayStreams();
+            }).detach();
     }
-
-    // Create a thread for running the demux Streams and display function
-    std::thread([&numStreams, &frameQueues](){
-        DemuxStreams demuxStreams(numStreams, frameQueues);
-        demuxStreams.readAndDisplayStreams();
-        }).detach();
-
     //queue to send the original frame from "write_all" to "post_prossing_all" for drawing the detections
     std::queue<cv::Mat> frameQueue;
     std::queue<int> streamIdQueue;
