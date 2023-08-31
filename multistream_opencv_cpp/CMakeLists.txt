@@ -53,8 +53,7 @@ link_directories(
     ${EXTERNAL_INSTALL_LOCATION}/xtensor/lib
 )
 
-find_package(xtensor REQUIRED)
-message(STATUS "Found xtensor: " ${xtensor_INCLUDE_DIRS})
+
 
 # set the source files
 set(utils_path ${CMAKE_CURRENT_SOURCE_DIR}/utils/)
