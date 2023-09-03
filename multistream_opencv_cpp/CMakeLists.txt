@@ -14,8 +14,8 @@ if(MSVC)
     )
 elseif(UNIX)
   # Set optimization flags for non-Visual Studio compilers
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall -pthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall -pthread")
   add_definitions(/DNOMINMAX
 				  /D_HAILO_EXPORTING
     )
@@ -39,16 +39,14 @@ ExternalProject_Add(xtl
 # Build xtensor
 ExternalProject_Add(xtensor
     GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION} -Dxtl_DIR=${CMAKE_BINARY_DIR}/build/external/share/cmake/xtl
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION} -Dxtl_DIR=${CMAKE_BINARY_DIR}/external/share/cmake/xtl
     BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
 )
 
 # Set the include and link directories for external projects
 include_directories(
     ${EXTERNAL_INSTALL_LOCATION}/include
-)
-link_directories(
-    ${EXTERNAL_INSTALL_LOCATION}/lib
+    #${EXTERNAL_INSTALL_LOCATION}/lib
 )
 
 
