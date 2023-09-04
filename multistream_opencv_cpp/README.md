@@ -5,7 +5,7 @@ The output stream from the chip then demuxed and sent for display.
 
 ## Build Environment for Ubuntu
 1. Install CMake version 3.23.0 and up.
-2. Install hailort from hailo site.
+2. Install hailort (minimum version 4.14) from hailo site.
 3. Install opencv for c++.
 2. Install hailort from hailo site (https://www.hailo.ai/).
 3. Install opencv for c++ (https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html).
