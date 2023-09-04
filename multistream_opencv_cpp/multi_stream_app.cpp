@@ -160,10 +160,12 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
             {
                 std::cerr << "Failed writing to device data of image. Got status = " << status << std::endl;
                 return status;
-            } 
-            std::lock_guard<std::mutex> lock(queueMutex);
-            frameIdQueue.push(i);
-            frameQueue.push(resized_image.clone());
+            }
+            if(Display){
+               std::lock_guard<std::mutex> lock(queueMutex);
+               frameIdQueue.push(i);
+               frameQueue.push(resized_image.clone());
+            }
             
         }
         if (endReached)
@@ -238,17 +240,18 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
 
     int numStreams = captures.size();
     std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues;
-    for (int i = 0; i < numStreams; i++) {
-        auto queue = std::make_shared<SynchronizedQueue>(i);
-        frameQueues.push_back(queue);
+    if(Display){
+       for (int i = 0; i < numStreams; i++) {
+           auto queue = std::make_shared<SynchronizedQueue>(i);
+           frameQueues.push_back(queue);
+       }
+   
+       // Create a thread for running the demux Streams and display function
+       std::thread([&numStreams, &frameQueues](){
+           DemuxStreams demuxStreams(numStreams, frameQueues);
+           demuxStreams.readAndDisplayStreams();
+           }).detach();
     }
-
-    // Create a thread for running the demux Streams and display function
-    std::thread([&numStreams, &frameQueues](){
-        DemuxStreams demuxStreams(numStreams, frameQueues);
-        demuxStreams.readAndDisplayStreams();
-        }).detach();
-
     //queue to send the original frame from "write_all" to "post_prossing_all" for drawing the detections
     std::queue<cv::Mat> frameQueue;
     std::queue<int> streamIdQueue;
