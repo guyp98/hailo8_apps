@@ -14,14 +14,21 @@ if(MSVC)
     )
 elseif(UNIX)
   # Set optimization flags for non-Visual Studio compilers
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall -pthread")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mavx2 -mfma -finline-limit=1000000 -ffp-contract=fast -Wall -pthread")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -finline-limit=1000000 -ffp-contract=fast -Wall -pthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -finline-limit=1000000 -ffp-contract=fast -Wall -pthread")
   add_definitions(/DNOMINMAX
 				  /D_HAILO_EXPORTING
     )
+    option(ARK "arm or x86 unix")
+  if(ARC STREQUAL "x86")
+    set(CMAKE_C_FLAGS "-mavx2 -mfma")
+    set(CMAKE_CXX_FLAGS "-mavx2 -mfma")
+  endif()
 else()
     message(FATAL_ERROR "Unsupported compiler")
 endif()
+
+
 
 # include directories
 find_package(OpenCV REQUIRED)
