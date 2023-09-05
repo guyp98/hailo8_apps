@@ -37,6 +37,17 @@ The output stream from the chip then demuxed and sent for display.
     ```
 * {network to run} - YOLOV5_APP or POSE_EST_APP or SEMANTIC_APP or INSTANCE_SEG_APP or MOBILENETSSD_APP .
    for example "cmake -DMACRO_SET=YOLOV5_APP .."
+
+## Using the Code at Runtime
+   You can control the number of streams and display using the following runtime options:
+
+   -s [num]: Specifies the number of streams to run.<br>
+   -d [true/false]: Use true to enable display, and false to disable it.
+   For example, to run the application with 3 streams and display disabled, you can use the following command:
+   ```
+   ./multi_stream_app -s 3 -d false
+   ```
+
 ## Common Pitfalls with Windows
 * If the project path is too long, you may encounter an error. It is recommended to keep your path short.
 * Running the project from a path with spaces in its name can sometimes cause unexpected errors.
