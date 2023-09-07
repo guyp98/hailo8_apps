@@ -12,6 +12,7 @@
  
 bool Display;
 int numofStreams;
+std::string source_path = VideoPath0;
 
 
 hailo_status create_feature(hailo_output_vstream vstream,
@@ -221,7 +222,7 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     std::vector<cv::VideoCapture> captures;
     for (int i = 0; i < numofStreams; i++) {
         if(i%3 == 0)
-            captures.push_back(cv::VideoCapture( VideoPath0));  
+            captures.push_back(cv::VideoCapture( source_path));  
             // captures.push_back(cv::VideoCapture("v4l2src device=/dev/video0 io-mode=mmap ! video/x-raw,format=NV12,width=1920,height=1080, framerate=60/1 ! appsink", cv::CAP_GSTREAMER));  
         else if(i%3 == 1)
             captures.push_back(cv::VideoCapture( VideoPath1));
@@ -382,11 +383,12 @@ l_exit:
 void parse_args(int argc, char* argv[])
 {
         cxxopts::Options options("MyProgram", "A brief description");
-        
+        std::string default_= "default";       
         options.add_options()
             ("h,help", "Print help")
             ("s,num_fo_streams", "number of streams to run ", cxxopts::value<int>()->default_value("4"))
-            ("d, display", "Display output (true or false)", cxxopts::value<std::string>()->default_value("true"));
+            ("d, display", "Display output (true or false)", cxxopts::value<std::string>()->default_value("true"))
+            ("p, source", "path to source", cxxopts::value<std::string>()->default_value(default_));
             
         
         auto result = options.parse(argc, argv);
@@ -407,7 +409,10 @@ void parse_args(int argc, char* argv[])
             exit(1);
         }
         numofStreams = result["num_fo_streams"].as<int>(); 
-
+        std::string source_path_temp = result["source"].as<std::string>();
+        if(source_path_temp != default_){
+            source_path = source_path_temp;
+        }
 
 }
 hailo_status image_resize(cv::Mat &resized_image,cv::Mat from_image, int image_width, int image_height)
