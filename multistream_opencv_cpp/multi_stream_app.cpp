@@ -137,18 +137,13 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
     std::iota(numStreams.begin(), numStreams.end(), 0);
     while (true) {
         cv::Mat org_frame;
-        bool endReached = false;
         for (int &i : numStreams) {
-            captures[i] >> org_frame;
+            captures[i].read(org_frame);
             
             //find if stream ended
             if (org_frame.empty()) {
-                numStreams.erase(std::remove(numStreams.begin(), numStreams.end(), i), numStreams.end());
-                if(numStreams.size() == 0){
-                    endReached = true;
-                    std::printf("finished reading all streams\n");
-                }
-                break;
+                // captures[i].set(cv::CAP_PROP_POS_FRAMES, 0);//for restarting a video 
+                continue; // Continue to the next iteration
             }
 
             cv::Mat resized_image;
@@ -168,8 +163,6 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
             }
             
         }
-        if (endReached)
-            break; 
     }
     // Release the video capture resources
     for (cv::VideoCapture& capture : captures) {
