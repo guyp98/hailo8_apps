@@ -83,9 +83,9 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         
         num_of_frames++;
         double time = rm->endTimer(TIMER_1);
-        std::cout << "hailo+postprocess FPS: " << (num_of_frames/time)*1000.0 << std::endl;
+        std::cout << "hailo+postprocess FPS: " << (num_of_frames/time)*1000.0 << "\n";
         double time1 = rm->endTimer(TIMER_2);
-        std::cout << "postprocess milliseconds: " << time1 << std::endl;       
+        std::cout << "postprocess milliseconds: " << time1 << "\n";       
         
         for (auto &feature : features)
         {
@@ -143,7 +143,8 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
             
             //find if stream ended
             if (org_frame.empty()) {
-                // captures[i].set(cv::CAP_PROP_POS_FRAMES, 0);//for restarting a video 
+                std::cout << "Stream " << i << " ended" << std::endl;
+                captures[i].set(cv::CAP_PROP_POS_FRAMES, 0);//for restarting a video 
                 continue; // Continue to the next iteration
             }
 
@@ -220,10 +221,10 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
       
     
     std::vector<cv::VideoCapture> captures;
-    for (int i = 0; i < numofStreams; i++) {
+  
+    for (int i = 1; i < numofStreams; i++) {
         if(i%3 == 0)
-            captures.push_back(cv::VideoCapture( source_path));  
-            // captures.push_back(cv::VideoCapture("v4l2src device=/dev/video0 io-mode=mmap ! video/x-raw,format=NV12,width=1920,height=1080, framerate=60/1 ! appsink", cv::CAP_GSTREAMER));  
+            captures.push_back(cv::VideoCapture( source_path));    
         else if(i%3 == 1)
             captures.push_back(cv::VideoCapture( VideoPath1));
         else
