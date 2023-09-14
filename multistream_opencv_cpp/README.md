@@ -8,7 +8,7 @@ The output stream from the chip then demuxed and sent for display.
 2. Install hailort (minimum version 4.14) from hailo site.
 3. Install opencv for c++.
 2. Install hailort from hailo site (https://www.hailo.ai/).
-3. Install opencv for c++ (https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html).
+3. Install opencv for c++ (https://linuxize.com/post/how-to-install-opencv-on-ubuntu-20-04/).
 5. Clone the project.
 6. run the following commands:
    ```
