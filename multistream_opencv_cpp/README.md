@@ -43,6 +43,7 @@ The output stream from the chip then demuxed and sent for display.
 
    -s [num]: Specifies the number of streams to run.<br>
    -d [true/false]: Use true to enable display, and false to disable it.
+   -p [string]: user surce path for fist frame
    For example, to run the application with 3 streams and display disabled, you can use the following command:
    ```
    ./multi_stream_app -s 3 -d false
