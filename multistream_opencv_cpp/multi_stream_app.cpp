@@ -222,7 +222,7 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     
     std::vector<cv::VideoCapture> captures;
   
-    for (int i = 1; i < numofStreams; i++) {
+    for (int i = 0; i < numofStreams; i++) {
         if(i%3 == 0)
             captures.push_back(cv::VideoCapture( source_path));    
         else if(i%3 == 1)
