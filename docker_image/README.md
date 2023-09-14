@@ -26,7 +26,7 @@ This will build the Docker image and tag it as `ubuntu22-decktop`.
 To run the Docker image, use the following command:
 
 ```
-docker run -it ubuntu22-decktop
+docker run --device=/dev/video0 --device=/dev/hailo0 -it --env=DISPLAY --volume=/tmp/.X11-unix:/tmp/.X11-unix  ubuntu22-decktop /bin/bash
 ```
 
 This will start a container from the `ubuntu22-decktop` image and open a command prompt inside the container.
