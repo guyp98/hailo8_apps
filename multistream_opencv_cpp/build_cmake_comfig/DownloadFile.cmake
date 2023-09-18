@@ -91,7 +91,7 @@ endforeach()
 #Download docker image
 set(docker_image_name "ubuntu22-decktop.tar.gz")
 set(docker_image_url "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/dockerImages/ubuntu22-decktop.tar.gz")
-set(download_dir "../../docker_images")
+set(download_dir "../../docker_image")
 
 if(NOT EXISTS "${download_dir}/${docker_image_name}")
     message(STATUS "Downloading ${docker_image_name} from ${docker_image_url}")
