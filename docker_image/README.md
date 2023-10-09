@@ -13,7 +13,7 @@ This directory contains a Dockerfile for building a Docker image that includes t
 
 To build the Docker image:
 1. navigate to the `docker_image` directory 
-2. move the " hailort_*_amd64.deb "
+2. move the 'hailort_*_amd64.deb' to `docker_image` dir 
 3. and run the following command:
 ```
 docker build -t ubuntu22-decktop .
