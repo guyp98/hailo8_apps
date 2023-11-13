@@ -8,13 +8,14 @@
  **/
 
 #include "multi_stream_app.hpp"
+#include "hailo_hw_c.hpp"
 
  
 bool Display;
 int numofStreams;
 std::string source_path = VideoPath0;
 
-
+// Function to create a feature from the output virtual stream
 hailo_status create_feature(hailo_output_vstream vstream,
                             std::shared_ptr<FeatureData> &feature)
 {
@@ -41,6 +42,7 @@ hailo_status create_feature(hailo_output_vstream vstream,
     return HAILO_SUCCESS;
 }
 
+// Function for post-processing based on the application type
 void post_process_fun(HailoROIPtr roi)
 {
     #ifdef YOLOV5_APP
@@ -58,6 +60,7 @@ void post_process_fun(HailoROIPtr roi)
     #endif 
 }
 
+// Function for post-processing all the features
 hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &features,
                                  std::queue<cv::Mat>& frameQueue, std::queue<int>& frameIdQueue, std::mutex& queueMutex,std::vector<std::shared_ptr<SynchronizedQueue>> frameQueues)
 {
@@ -74,18 +77,14 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
             roi->add_tensor(std::make_shared<HailoTensor>(reinterpret_cast<uint8_t *>(features[j]->m_buffers.get_read_buffer().data()), features[j]->m_vstream_info));
             
         
+        // rm->startTimer(TIMER_2);
         
-        
-        rm->startTimer(TIMER_2);
-        
-
         post_process_fun(roi);
         
         num_of_frames++;
         double time = rm->endTimer(TIMER_1);
-        std::cout << "hailo+postprocess FPS: " << (num_of_frames/time)*1000.0 << "\n";
-        double time1 = rm->endTimer(TIMER_2);
-        std::cout << "postprocess milliseconds: " << time1 << "\n";       
+        // double time1 = rm->endTimer(TIMER_2);
+        PrintLock::getInstance().print(std::string("\033[A\rhailo+postprocess FPS avg: ") + std::to_string((num_of_frames/time)*1000.0)  + "\n");       
         
         for (auto &feature : features)
         {
@@ -133,7 +132,6 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
     //start time measurement
     RuntimeMeasure* rm = RuntimeMeasure::getInstance();
     rm->startTimer(TIMER_1);
-    // int numStreams = captures.size();
     std::vector<int> numStreams(captures.size());
     std::iota(numStreams.begin(), numStreams.end(), 0);
     while (true) {
@@ -143,7 +141,7 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
             
             //find if stream ended
             if (org_frame.empty()) {
-                std::cout << "Stream " << i << " ended" << std::endl;
+                PrintLock::getInstance().print(std::string("Stream ") + std::to_string(i) + " ended\n");
                 captures[i].set(cv::CAP_PROP_POS_FRAMES, 0);//for restarting a video 
                 continue; // Continue to the next iteration
             }
@@ -259,7 +257,6 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
     auto pp_thread(std::async(post_processing_all, std::ref(features), std::ref(frameQueue), std::ref(streamIdQueue), std::ref(queueMutex), frameQueues));
     
 
-    ;
     // End threads
     hailo_status out_status = HAILO_SUCCESS;
     for (size_t i = 0; i < output_threads.size(); i++)
@@ -291,93 +288,20 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
         return pp_status;
     }
 
-    
-
     return HAILO_SUCCESS;
 }
 
 hailo_status infer()
 {
-
     hailo_status status = HAILO_UNINITIALIZED;
-    hailo_vdevice vdevice = NULL;
-    hailo_hef hef = NULL;
-    hailo_configure_params_t config_params = {0};
-    hailo_configured_network_group network_group = NULL;
-    size_t network_group_size = 1;
-    hailo_input_vstream_params_by_name_t input_vstream_params[INPUT_COUNT] = {0};
-    hailo_output_vstream_params_by_name_t output_vstream_params[OUTPUT_COUNT] = {0};
-    size_t input_vstreams_size = INPUT_COUNT;
-    size_t output_vstreams_size = OUTPUT_COUNT;
-    hailo_input_vstream input_vstreams[INPUT_COUNT] = {NULL};
-    hailo_output_vstream output_vstreams[OUTPUT_COUNT] = {NULL};
-    bool quantized = true;
-
-    status = hailo_create_vdevice(NULL, &vdevice);
-    REQUIRE_SUCCESS(status, l_exit, "Failed to create vdevice");
-
-    status = hailo_create_hef_file(&hef, HEF_FILE);
-    REQUIRE_SUCCESS(status, l_release_vdevice, "Failed reading hef file");
-
-    status = hailo_init_configure_params_by_vdevice(hef, vdevice, &config_params);
-    REQUIRE_SUCCESS(status, l_release_hef, "Failed initializing configure parameters");
-
-    status = hailo_configure_vdevice(vdevice, hef, &config_params, &network_group, &network_group_size);
-    REQUIRE_SUCCESS(status, l_release_hef, "Failed configure vdevice from hef");
-    REQUIRE_ACTION(network_group_size == 1, status = HAILO_INVALID_ARGUMENT, l_release_hef, 
-        "Invalid network group size");
-
-
-    // Set input format type to auto, and mark the data as quantized - libhailort will not scale the data before writing to the HW
-    quantized = true;
-    status = hailo_make_input_vstream_params(network_group, quantized, HAILO_FORMAT_TYPE_AUTO,
-        input_vstream_params, &input_vstreams_size);
-    REQUIRE_SUCCESS(status, l_release_hef, "Failed making input virtual stream params");
-
-    /* The input format order in the example HEF is NHWC in the user-side (may be seen using 'hailortcli parse-hef <HEF_PATH>).
-       Here we override the user-side format order to be NCHW */
-    for (size_t i = 0 ; i < input_vstreams_size; i++) {
-        input_vstream_params[i].params.user_buffer_format.order = HAILO_FORMAT_ORDER_AUTO;
+    hailo_hw_c hw = hailo_hw_c(status);
+    if (HAILO_SUCCESS != status)
+    {
+        std::cerr << "cofigure hailo failed with status = " << status << std::endl;
+        return status;
     }
-
-    // Set output format type to float32, and mark the data as not quantized - libhailort will de-quantize the data after reading from the HW
-    // Note: this process might affect the overall performance
-    quantized = true;
-    status = hailo_make_output_vstream_params(network_group, quantized, HAILO_FORMAT_TYPE_AUTO,
-        output_vstream_params, &output_vstreams_size);
-    REQUIRE_SUCCESS(status, l_release_hef, "Failed making output virtual stream params");
-
-    REQUIRE_ACTION((input_vstreams_size <= INPUT_COUNT || output_vstreams_size <= OUTPUT_COUNT),
-        status = HAILO_INVALID_OPERATION, l_release_hef, "Trying to infer network with too many input/output virtual "
-        "streams, (either change HEF or change the definition of INPUT_COUNT, OUTPUT_COUNT)\n");
-
-    status = hailo_create_input_vstreams(network_group, input_vstream_params, input_vstreams_size, input_vstreams);
-    REQUIRE_SUCCESS(status, l_release_hef, "Failed creating virtual input streams\n");
-
-    status = hailo_create_output_vstreams(network_group, output_vstream_params, output_vstreams_size, output_vstreams);
-    REQUIRE_SUCCESS(status, l_release_input_vstream, "Failed creating output virtual streams\n");
-
-    status = run_inference_threads(input_vstreams[0], output_vstreams, output_vstreams_size);
-    REQUIRE_SUCCESS(status, l_release_output_vstream, "Inference failure");
-
-    std::printf("Inference ran successfully\n");
-    status = HAILO_SUCCESS;
-
-l_release_output_vstream:
-    (void)hailo_release_output_vstreams(output_vstreams, output_vstreams_size);
-l_release_input_vstream:
-    (void)hailo_release_input_vstreams(input_vstreams, input_vstreams_size);
-l_release_hef:
-    (void) hailo_release_hef(hef);
-l_release_vdevice:
-    (void) hailo_release_vdevice(vdevice);
-l_exit:
+    status = run_inference_threads(hw.get_input_vstreams()[0], hw.get_output_vstreams(), hw.get_output_vstreams_size());
     return status;
-
-
-
-
-
 }
 
 
@@ -396,7 +320,7 @@ void parse_args(int argc, char* argv[])
         
         if (result.count("help")) 
         {
-                std::cout << options.help() << std::endl;
+                PrintLock::getInstance().print( options.help() );
                 exit(0);
         }
      
@@ -434,11 +358,12 @@ hailo_status image_resize(cv::Mat &resized_image,cv::Mat from_image, int image_w
 
 int main(int argc, char* argv[])
 {   
+    hailo_status status = HAILO_UNINITIALIZED;
     parse_args(argc, argv);
     std::printf("display: %s\n", Display ? "true" : "false");
     std::printf("number of streams: %d\n", numofStreams);
 
-    hailo_status status;
+    // hailo_status status;
     status = infer();
     if (HAILO_SUCCESS != status)
     {

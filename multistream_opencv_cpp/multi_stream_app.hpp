@@ -28,6 +28,7 @@
 #include "utils/SynchronizedQueue.hpp"
 #include "utils/DemuxStreams.hpp"
 #include "utils/RuntimeMeasure.hpp"
+#include "utils/PrintLock.hpp"
 
 #include <algorithm>
 #include <future>

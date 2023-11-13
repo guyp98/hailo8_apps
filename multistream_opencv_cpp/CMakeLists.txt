@@ -65,6 +65,7 @@ set(utility_source_files
     ${utils_path}SynchronizedQueue.cpp
     ${utils_path}DemuxStreams.cpp
     ${utils_path}RuntimeMeasure.cpp
+    ${utils_path}PrintLock.cpp
     )
 
 
@@ -156,6 +157,7 @@ include(${apps_base_conf}DownloadFile.cmake)
 # build the app
 add_executable(multi_stream_app 
             multi_stream_app.cpp
+            hailo_hw_c.hpp
             ${utility_source_files}
             ${hailo_utils}
             )
