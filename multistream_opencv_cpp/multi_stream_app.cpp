@@ -84,7 +84,7 @@ hailo_status post_processing_all(std::vector<std::shared_ptr<FeatureData>> &feat
         num_of_frames++;
         double time = rm->endTimer(TIMER_1);
         // double time1 = rm->endTimer(TIMER_2);
-        PrintLock::getInstance().print(std::string("\033[A\rhailo+postprocess FPS avg: ") + std::to_string((num_of_frames/time)*1000.0)  + "\n");       
+        PrintLock::getInstance().print(std::string("\033[A\033[2K\rhailo+postprocess FPS avg: ") + std::to_string((num_of_frames/time)*1000.0)  + "\n");       
         
         for (auto &feature : features)
         {
@@ -141,7 +141,7 @@ hailo_status write_all(hailo_input_vstream input_vstream, std::queue<cv::Mat>& f
             
             //find if stream ended
             if (org_frame.empty()) {
-                PrintLock::getInstance().print(std::string("Stream ") + std::to_string(i) + " ended\n");
+                PrintLock::getInstance().print(std::string("\033[A\033[2K\rRestarting Stream ") + std::to_string(i) + "\n\n");
                 captures[i].set(cv::CAP_PROP_POS_FRAMES, 0);//for restarting a video 
                 continue; // Continue to the next iteration
             }
