@@ -27,6 +27,7 @@ public:
         score_threshold = 0.25;
         outputs_size = {20, 40, 80};
         outputs_name = {"yolov5n_seg/conv63", "yolov5n_seg/conv48", "yolov5n_seg/conv55", "yolov5n_seg/conv61"};
+        // outputs_name = {"yolov5m_seg/conv85", "yolov5m_seg/conv66", "yolov5m_seg/conv75", "yolov5m_seg/conv83"}; // for yolov5m
         anchors = {{116, 90, 156, 198, 373, 326},
                                             {30, 61, 62, 45, 59, 119},
                                             {10, 13, 16, 30, 33, 23} };
