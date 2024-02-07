@@ -15,11 +15,14 @@
 #include "centerpose.hpp"
 #elif defined(SEMANTIC_APP)
 #include "semantic_segmentation.hpp"
-#elif defined(INSTANCE_SEG_APP)
+#elif defined(INSTANCE_SEG_APP_YOLACT)
 #include "yolact.hpp"
 #elif defined(MOBILENETSSD_APP)
 #include "mobilenet_ssd.hpp"
+#elif defined(INSTANCE_SEG_APP_YOLOV5)
+#include "yolov5seg.hpp"
 #endif
+
 
 #include "hailo_objects.hpp"
 #include "hailo_tensors.hpp"
@@ -29,6 +32,7 @@
 #include "utils/DemuxStreams.hpp"
 #include "utils/RuntimeMeasure.hpp"
 #include "utils/PrintLock.hpp"
+#include "hailo_hw_c.hpp"
 
 #include <algorithm>
 #include <future>

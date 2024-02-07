@@ -8,7 +8,7 @@
  **/
 
 #include "multi_stream_app.hpp"
-#include "hailo_hw_c.hpp"
+
 
  
 bool Display;
@@ -52,11 +52,15 @@ void post_process_fun(HailoROIPtr roi)
         centerpose_416(roi);
     #elif defined(SEMANTIC_APP)
         filter(roi);
-    #elif defined(INSTANCE_SEG_APP)
+    #elif defined(INSTANCE_SEG_APP_YOLACT)
         YolactParams *init_params = init("dont_care","dont_care");
         yolact800mf(roi,init_params);
     #elif defined(MOBILENETSSD_APP)
         mobilenet_ssd(roi);
+    #elif defined(INSTANCE_SEG_APP_YOLOV5)
+        std::string CONFIG_FILE = "dont_care";
+        Yolov5segParams *init_params = init(CONFIG_FILE, "yolov5_seg");
+        filter(roi,init_params);    
     #endif 
 }
 

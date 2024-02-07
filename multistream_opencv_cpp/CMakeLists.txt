@@ -75,7 +75,8 @@ set(post_detection ${relative_workspace}/core/hailo/libs/postprocesses/detection
 set(post_detection2 ${relative_workspace}/core/hailo/libs/postprocesses/detection/yolo_output.cpp)
 set(post_pose_est ${relative_workspace}/core/hailo/libs/postprocesses/pose_estimation/centerpose.cpp)
 set(post_semantic_seg ${relative_workspace}/core/hailo/libs/postprocesses/semantic_segmentation/semantic_segmentation.cpp)
-set(post_instance_seg ${relative_workspace}/core/hailo/libs/postprocesses/instance_segmentation/yolact.cpp)
+set(post_instance_seg_yolact ${relative_workspace}/core/hailo/libs/postprocesses/instance_segmentation/yolact.cpp)
+set(post_instance_seg_yolov5 ${relative_workspace}/core/hailo/libs/postprocesses/instance_segmentation/yolov5_seg/yolov5seg.cpp)
 set(post_mobilenet ${relative_workspace}/core/hailo/libs/postprocesses/detection/mobilenet_ssd.cpp)
 set(common_tensors_file ${relative_workspace}/core/hailo/libs/postprocesses/common/tensors.cpp)
 
@@ -127,16 +128,26 @@ elseif(MACRO_SET STREQUAL "SEMANTIC_APP")
         ${relative_workspace}/core/hailo/libs/postprocesses/semantic_segmentation
     )
     include(${apps_base_conf}CMakeLists_SEMANTIC.txt)
-elseif(MACRO_SET STREQUAL "INSTANCE_SEG_APP")
+elseif(MACRO_SET STREQUAL "INSTANCE_SEG_APP_YOLACT")
     set(hailo_utils 
         ${overlay_file}
-        ${post_instance_seg}
+        ${post_instance_seg_yolact}
         ${common_tensors_file}
         )
     include_directories(
         ${relative_workspace}/core/hailo/libs/postprocesses/instance_segmentation
     )
-    include(${apps_base_conf}CMakeLists_INSTANCE_SEG.txt)
+    include(${apps_base_conf}CMakeLists_INSTANCE_SEG_YOLACT.txt)
+elseif(MACRO_SET STREQUAL "INSTANCE_SEG_APP_YOLOV5")
+    set(hailo_utils 
+        ${overlay_file}
+        ${post_instance_seg_yolov5}
+        ${common_tensors_file}
+        )
+    include_directories(
+        ${relative_workspace}/core/hailo/libs/postprocesses/instance_segmentation/yolov5_seg
+    )
+    include(${apps_base_conf}CMakeLists_INSTANCE_SEG_YOLOV5.txt)
 elseif(MACRO_SET STREQUAL "MOBILENETSSD_APP")
     set(hailo_utils 
         ${overlay_file}
