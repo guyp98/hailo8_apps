@@ -17,7 +17,7 @@ The output stream from the chip then demuxed and sent for display.
    cmake -DMACRO_SET={network to run} ..
    cmake --build . --config Release
    .\multi_stream_app
-  * {network to run} - YOLOV5_APP or POSE_EST_APP or SEMANTIC_APP or INSTANCE_SEG_APP or MOBILENETSSD_APP .
+  * {network to run} - YOLOV5_APP or POSE_EST_APP or SEMANTIC_APP or INSTANCE_SEG_APP_YOLOV5 or INSTANCE_SEG_APP_YOLACT or MOBILENETSSD_APP .
    for example "cmake -DMACRO_SET=YOLOV5_APP .." ```
   * also you can add an optimization for x86 architecture like this "cmake -DMACRO_SET={network to run} -DARK=x86 .. "
     
