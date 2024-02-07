@@ -17,6 +17,8 @@ set(hef_urls
     "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/ssd_mobilenet_v1.hef"
     "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/yolact_regnetx_800mf.hef"
     "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/yolov5m_wo_spp_60p.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/yolov5m_seg.hef"
+    "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8/yolov5n_seg.hef"
     "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h15/centerpose_repvgg_a0_h15.hef"
     "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h15/yolact_regnetx_800mf_h15.hef"
     "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h15/yolov5m_wo_spp_60p_h15.hef"
