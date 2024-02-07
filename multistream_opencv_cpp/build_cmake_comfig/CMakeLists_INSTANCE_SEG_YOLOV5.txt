@@ -1,7 +1,7 @@
 set(MACRO_SET
     -DINSTANCE_SEG_APP_YOLOV5
     -DINPUT_COUNT=1
-    -DOUTPUT_COUNT=16
+    -DOUTPUT_COUNT=4
     -DINPUT_FILES_COUNT=95
     -DHEF_FILE="../../network_hef/yolov5n_seg.hef"
     -DVideoPath0="../../input_images/detection.mp4"

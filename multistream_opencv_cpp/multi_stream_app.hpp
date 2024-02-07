@@ -32,7 +32,6 @@
 #include "utils/DemuxStreams.hpp"
 #include "utils/RuntimeMeasure.hpp"
 #include "utils/PrintLock.hpp"
-#include "hailo_hw_c.hpp"
 
 #include <algorithm>
 #include <future>

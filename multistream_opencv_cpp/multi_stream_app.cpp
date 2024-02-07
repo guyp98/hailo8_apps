@@ -8,6 +8,7 @@
  **/
 
 #include "multi_stream_app.hpp"
+#include "hailo_hw_c.hpp"
 
 
  
@@ -212,7 +213,6 @@ hailo_status run_inference_threads(hailo_input_vstream input_vstream, hailo_outp
 
         features.emplace_back(feature);
     }
-
     // Create read threads, for each output of the network (aka out vstream) we have a thread that reads the output
     std::vector<std::future<hailo_status>> output_threads;
     output_threads.reserve(output_vstreams_size);

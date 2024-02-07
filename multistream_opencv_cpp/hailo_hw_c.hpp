@@ -84,8 +84,8 @@ public:
     // Destructor
     ~hailo_hw_c() {
         (void)hailo_release_output_vstreams(output_vstreams, OUTPUT_COUNT);
-        (void) hailo_release_hef(hef);
-        (void) hailo_release_vdevice(vdevice);
+        (void)hailo_release_hef(hef);
+        (void)hailo_release_vdevice(vdevice);
     }
 
     hailo_input_vstream* get_input_vstreams() {

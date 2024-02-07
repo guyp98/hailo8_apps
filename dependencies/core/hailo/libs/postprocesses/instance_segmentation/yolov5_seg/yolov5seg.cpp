@@ -241,7 +241,7 @@ Yolov5segParams *init(const std::string config_path, const std::string function_
     Yolov5segParams *params = new Yolov5segParams();
     if (!fs::exists(config_path))
     {
-        std::cerr << "Config file doesn't exist, using default parameters" << std::endl;
+        // std::cerr << "Config file doesn't exist, using default parameters" << std::endl; /// TODO: Create a logger and not print it because its distrupts the printing of the fps
     }
     else {
         char config_buffer[4096];
