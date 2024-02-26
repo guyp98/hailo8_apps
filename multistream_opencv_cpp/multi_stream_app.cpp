@@ -8,7 +8,7 @@
  **/
 
 #include "multi_stream_app.hpp"
-#include "hailo_hw_c.hpp"
+#include "utils/hailo_hw_c.hpp"
 
 
  
